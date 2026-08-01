@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { getApiErrorMessage } from "@/lib/api-error";
+import styles from "./Auth.module.scss";
 
 export function RegisterForm() {
   const { register } = useAuth();
@@ -37,16 +38,16 @@ export function RegisterForm() {
 
   if (submittedEmail) {
     return (
-      <div className="mx-auto flex w-full max-w-sm flex-col gap-4">
-        <h1 className="text-2xl font-semibold">Check your email</h1>
-        <p className="text-sm text-zinc-600">
+      <div className={styles.container}>
+        <h1 className={styles.title}>Check your email</h1>
+        <p className={styles.text}>
           We sent a verification link to{" "}
-          <span className="font-medium text-zinc-900">{submittedEmail}</span>.
+          <span className={styles.email}>{submittedEmail}</span>.
           Open it to verify your account, then sign in.
         </p>
         <Link
           href="/login"
-          className="rounded bg-zinc-900 px-3 py-2 text-center text-sm font-medium text-white hover:bg-zinc-800"
+          className={styles.buttonLink}
         >
           Go to sign in
         </Link>
@@ -55,13 +56,10 @@ export function RegisterForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mx-auto flex w-full max-w-sm flex-col gap-4"
-    >
-      <h1 className="text-2xl font-semibold">Create account</h1>
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <h1 className={styles.title}>Create account</h1>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={styles.label}>
         Name
         <input
           type="text"
@@ -69,11 +67,11 @@ export function RegisterForm() {
           required
           value={name}
           onChange={(event) => setName(event.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2"
+          className={styles.input}
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={styles.label}>
         Surname
         <input
           type="text"
@@ -81,11 +79,11 @@ export function RegisterForm() {
           required
           value={surname}
           onChange={(event) => setSurname(event.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2"
+          className={styles.input}
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={styles.label}>
         Email
         <input
           type="email"
@@ -93,11 +91,11 @@ export function RegisterForm() {
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2"
+          className={styles.input}
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={styles.label}>
         Password
         <input
           type="password"
@@ -106,23 +104,23 @@ export function RegisterForm() {
           minLength={8}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2"
+          className={styles.input}
         />
       </label>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className={styles.error}>{error}</p> : null}
 
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+        className={styles.button}
       >
         {pending ? "Creating account…" : "Register"}
       </button>
 
-      <p className="text-sm text-zinc-600">
+      <p className={styles.footer}>
         Already have an account?{" "}
-        <Link href="/login" className="underline">
+        <Link href="/login" className={styles.link}>
           Sign in
         </Link>
       </p>

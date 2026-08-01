@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { getApiErrorMessage } from "@/lib/api-error";
+import styles from "./Auth.module.scss";
 
 export function LoginForm() {
   const router = useRouter();
@@ -37,19 +38,16 @@ export function LoginForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mx-auto flex w-full max-w-sm flex-col gap-4"
-    >
-      <h1 className="text-2xl font-semibold">Sign in</h1>
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <h1 className={styles.title}>Sign in</h1>
 
       {verified ? (
-        <p className="rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+        <p className={styles.success}>
           Email verified. You can sign in now.
         </p>
       ) : null}
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={styles.label}>
         Email
         <input
           type="email"
@@ -57,11 +55,11 @@ export function LoginForm() {
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2"
+          className={styles.input}
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={styles.label}>
         Password
         <input
           type="password"
@@ -69,29 +67,29 @@ export function LoginForm() {
           required
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2"
+          className={styles.input}
         />
       </label>
 
-      <p className="text-right text-sm">
-        <Link href="/reset-password" className="underline text-zinc-600">
+      <p className={styles.forgotPassword}>
+        <Link href="/reset-password">
           Forgot password?
         </Link>
       </p>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className={styles.error}>{error}</p> : null}
 
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+        className={styles.button}
       >
         {pending ? "Signing in…" : "Sign in"}
       </button>
 
-      <p className="text-sm text-zinc-600">
+      <p className={styles.footer}>
         No account?{" "}
-        <Link href="/register" className="underline">
+        <Link href="/register" className={styles.link}>
           Register
         </Link>
       </p>

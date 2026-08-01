@@ -1,17 +1,16 @@
 import { Suspense } from "react";
+import { PageShell } from "@/components/PageShell";
 import { GuestOnly } from "@/features/auth/components/GuestOnly";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 
 export default function LoginPage() {
   return (
-    <main className="flex flex-1 items-center justify-center p-6">
+    <PageShell>
       <GuestOnly>
-        <Suspense
-          fallback={<p className="text-sm text-zinc-600">Loading…</p>}
-        >
+        <Suspense fallback={<p>Loading…</p>}>
           <LoginForm />
         </Suspense>
       </GuestOnly>
-    </main>
+    </PageShell>
   );
 }

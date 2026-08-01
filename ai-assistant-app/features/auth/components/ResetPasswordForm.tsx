@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { resetPassword } from "@/features/auth/api/auth.api";
 import { getApiErrorMessage } from "@/lib/api-error";
+import styles from "./Auth.module.scss";
 
 export function ResetPasswordForm() {
   const router = useRouter();
@@ -56,12 +57,12 @@ export function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="mx-auto flex w-full max-w-sm flex-col gap-4">
-        <h1 className="text-2xl font-semibold">Password updated</h1>
-        <p className="text-sm text-zinc-600">
+      <div className={styles.container}>
+        <h1 className={styles.title}>Password updated</h1>
+        <p className={styles.text}>
           Your password was changed. Redirecting to sign in…
         </p>
-        <Link href="/login" className="text-sm underline">
+        <Link href="/login" className={styles.link}>
           Go to sign in
         </Link>
       </div>
@@ -69,16 +70,13 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mx-auto flex w-full max-w-sm flex-col gap-4"
-    >
-      <h1 className="text-2xl font-semibold">Reset password</h1>
-      <p className="text-sm text-zinc-600">
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <h1 className={styles.title}>Reset password</h1>
+      <p className={styles.text}>
         Enter your email and current password, then choose a new one.
       </p>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={styles.label}>
         Email
         <input
           type="email"
@@ -86,11 +84,11 @@ export function ResetPasswordForm() {
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2"
+          className={styles.input}
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={styles.label}>
         Current password
         <input
           type="password"
@@ -98,11 +96,11 @@ export function ResetPasswordForm() {
           required
           value={oldPassword}
           onChange={(event) => setOldPassword(event.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2"
+          className={styles.input}
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={styles.label}>
         New password
         <input
           type="password"
@@ -111,11 +109,11 @@ export function ResetPasswordForm() {
           minLength={8}
           value={newPassword}
           onChange={(event) => setNewPassword(event.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2"
+          className={styles.input}
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={styles.label}>
         Confirm new password
         <input
           type="password"
@@ -124,23 +122,23 @@ export function ResetPasswordForm() {
           minLength={8}
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2"
+          className={styles.input}
         />
       </label>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className={styles.error}>{error}</p> : null}
 
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+        className={styles.button}
       >
         {pending ? "Updating…" : "Update password"}
       </button>
 
-      <p className="text-sm text-zinc-600">
+      <p className={styles.footer}>
         Remembered it?{" "}
-        <Link href="/login" className="underline">
+        <Link href="/login" className={styles.link}>
           Sign in
         </Link>
       </p>
