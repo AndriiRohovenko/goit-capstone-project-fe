@@ -4,14 +4,14 @@ import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/context/auth-context";
 
-/** Redirects authenticated users away from login/register. */
+/** Redirects authenticated users away from guest-only pages (home, login, register, reset password). */
 export function GuestOnly({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { isAuthenticated, isReady } = useAuth();
 
   useEffect(() => {
     if (isReady && isAuthenticated) {
-      router.replace("/dashboard");
+      router.replace("/dashboard/projects");
     }
   }, [isAuthenticated, isReady, router]);
 

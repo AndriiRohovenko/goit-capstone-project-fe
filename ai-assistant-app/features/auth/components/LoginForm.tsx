@@ -23,7 +23,7 @@ export function LoginForm() {
 
     try {
       await login({ email, password });
-      router.replace("/dashboard");
+      router.replace("/dashboard/projects");
     } catch (err) {
       setError(
         getApiErrorMessage(
@@ -72,6 +72,12 @@ export function LoginForm() {
           className="rounded border border-zinc-300 px-3 py-2"
         />
       </label>
+
+      <p className="text-right text-sm">
+        <Link href="/reset-password" className="underline text-zinc-600">
+          Forgot password?
+        </Link>
+      </p>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 

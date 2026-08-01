@@ -26,11 +26,11 @@ export function VerifyEmail() {
 
     async function run() {
       try {
-        // 200: store tokens → /users/me → AuthProvider → dashboard
+        // 200: store tokens → /users/me → AuthProvider → projects
         await verifyEmail(token!);
         setStatus("success");
         setMessage("Email verified. Signing you in…");
-        router.replace("/dashboard");
+        router.replace("/dashboard/projects");
       } catch (err) {
         // 400 already verified → /login (no tokens)
         if (isAxiosError(err) && err.response?.status === 400) {
@@ -70,7 +70,7 @@ export function VerifyEmail() {
           Go to sign in
         </Link>
       ) : status === "success" ? (
-        <p className="text-xs text-zinc-500">Redirecting to dashboard…</p>
+        <p className="text-xs text-zinc-500">Redirecting to projects…</p>
       ) : null}
     </div>
   );

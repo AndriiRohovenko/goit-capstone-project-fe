@@ -14,9 +14,9 @@ import type { TokenResponse } from "@/types/auth";
 const AUTH_SKIP_REFRESH_PATHS = [
   "/auth/login",
   "/auth/signup",
-  "/auth/register",
   "/auth/refresh",
   "/auth/verify-email",
+  "/auth/reset-password",
 ];
 
 type RetriableConfig = InternalAxiosRequestConfig & {
