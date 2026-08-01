@@ -1,5 +1,9 @@
-const ProjectsPage = () => {
-  return <div>ProjectsPage</div>;
-};
+import { ProjectList } from "@/features/projects/components/ProjectList";
 
-export default ProjectsPage;
+export default function ProjectsPage() {
+  return (
+    <main className="mx-auto w-full max-w-3xl p-6">
+      <ProjectList />
+    </main>
+  );
+}
