@@ -1,6 +1,13 @@
 .content {
+  flex: 1;
   width: 100%;
-  max-width: 48rem;
+  max-width: 72rem;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 2rem 1.5rem 3rem;
+}
+
+@media (max-width: 40rem) {
+  .content {
+    padding: 1.25rem 1rem 2rem;
+  }
 }

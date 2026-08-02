@@ -1,5 +1,9 @@
 import { apiClient } from "@/lib/api-client";
-import type { CreateProjectPayload, Project } from "@/types/project";
+import type {
+  CreateProjectPayload,
+  Project,
+  UpdateProjectPayload,
+} from "@/types/project";
 
 export async function getProjects(): Promise<Project[]> {
   const { data } = await apiClient.get<Project[]>("/projects");
@@ -16,4 +20,19 @@ export async function createProject(
 ): Promise<Project> {
   const { data } = await apiClient.post<Project>("/projects", payload);
   return data;
+}
+
+export async function updateProject(
+  projectId: string,
+  payload: UpdateProjectPayload,
+): Promise<Project> {
+  const { data } = await apiClient.patch<Project>(
+    `/projects/${projectId}`,
+    payload,
+  );
+  return data;
+}
+
+export async function deleteProject(projectId: string): Promise<void> {
+  await apiClient.delete(`/projects/${projectId}`);
 }
