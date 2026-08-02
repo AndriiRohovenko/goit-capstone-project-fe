@@ -1,0 +1,118 @@
+.container,
+.form {
+  display: flex;
+  width: 100%;
+  max-width: 24rem;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0 auto;
+}
+
+.container {
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.input {
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+
+  &:focus {
+    border-color: #71717a;
+    outline: 2px solid transparent;
+    box-shadow: 0 0 0 2px rgb(113 113 122 / 20%);
+  }
+}
+
+.button,
+.buttonLink {
+  border: 0;
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: #18181b;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    background: #27272a;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.text,
+.footer,
+.loading,
+.status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.status {
+  min-height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.smallText {
+  margin: 0;
+  color: #71717a;
+  font-size: 0.75rem;
+}
+
+.error {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.success {
+  margin: 0;
+  border: 1px solid #a7f3d0;
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 0.875rem;
+}
+
+.link {
+  text-decoration: underline;
+}
+
+.forgotPassword {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  text-align: right;
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.email {
+  color: #18181b;
+  font-weight: 500;
+}

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { isAxiosError } from "axios";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { getApiErrorMessage } from "@/lib/api-error";
+import styles from "./Auth.module.scss";
 
 type Status = "loading" | "success" | "error";
 
@@ -26,11 +27,11 @@ export function VerifyEmail() {
 
     async function run() {
       try {
-        // 200: store tokens → /users/me → AuthProvider → dashboard
+        // 200: store tokens → /users/me → AuthProvider → projects
         await verifyEmail(token!);
         setStatus("success");
         setMessage("Email verified. Signing you in…");
-        router.replace("/dashboard");
+        router.replace("/dashboard/projects");
       } catch (err) {
         // 400 already verified → /login (no tokens)
         if (isAxiosError(err) && err.response?.status === 400) {
@@ -53,24 +54,20 @@ export function VerifyEmail() {
   }, [token, router, verifyEmail]);
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-4 text-center">
-      <h1 className="text-2xl font-semibold">Email verification</h1>
-      <p
-        className={
-          status === "error" ? "text-sm text-red-600" : "text-sm text-zinc-600"
-        }
-      >
+    <div className={styles.container}>
+      <h1 className={styles.title}>Email verification</h1>
+      <p className={status === "error" ? styles.error : styles.text}>
         {message}
       </p>
       {status === "error" ? (
         <Link
           href="/login"
-          className="rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          className={styles.buttonLink}
         >
           Go to sign in
         </Link>
       ) : status === "success" ? (
-        <p className="text-xs text-zinc-500">Redirecting to dashboard…</p>
+        <p className={styles.smallText}>Redirecting to projects…</p>
       ) : null}
     </div>
   );

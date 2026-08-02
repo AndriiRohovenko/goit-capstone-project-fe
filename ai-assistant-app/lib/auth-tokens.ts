@@ -1,7 +1,7 @@
 /**
  * Bearer token holder for the API client layer.
  * Tokens are not exposed via React/TanStack Query/Redux.
- * sessionStorage keeps the session across reloads until HttpOnly cookies are available.
+ * localStorage keeps the session across tabs and browser restarts until HttpOnly cookies are available.
  */
 
 const ACCESS_KEY = "ai_assistant_access_token";
@@ -16,15 +16,15 @@ function canUseStorage() {
 
 function readStorage(key: string) {
   if (!canUseStorage()) return null;
-  return sessionStorage.getItem(key);
+  return localStorage.getItem(key);
 }
 
 function writeStorage(key: string, value: string | null) {
   if (!canUseStorage()) return;
   if (value) {
-    sessionStorage.setItem(key, value);
+    localStorage.setItem(key, value);
   } else {
-    sessionStorage.removeItem(key);
+    localStorage.removeItem(key);
   }
 }
 

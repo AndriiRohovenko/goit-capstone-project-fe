@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (payload: RegisterPayload) => {
     // Signup does not create a session — email must be verified first.
-    await authApi.register(payload);
+    await authApi.signup(payload);
   }, []);
 
   const verifyEmail = useCallback(async (token: string) => {

@@ -1,12 +1,12 @@
 import { PageShell } from "@/components/PageShell";
 import { GuestOnly } from "@/features/auth/components/GuestOnly";
-import { RegisterForm } from "@/features/auth/components/RegisterForm";
+import { ResetPasswordForm } from "@/features/auth/components/ResetPasswordForm";
 
-export default function RegisterPage() {
+export default function ResetPasswordPage() {
   return (
     <PageShell>
       <GuestOnly>
-        <RegisterForm />
+        <ResetPasswordForm />
       </GuestOnly>
     </PageShell>
   );
