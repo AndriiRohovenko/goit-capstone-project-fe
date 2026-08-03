@@ -10,14 +10,14 @@ import {
   FormTextarea,
 } from "@/components/Form";
 
-export type ProjectFormValues = {
+export type CreateProjectFormValues = {
   name: string;
   description: string;
 };
 
-type ProjectFormProps = {
-  defaultValues?: Partial<ProjectFormValues>;
-  onSubmit: (values: ProjectFormValues) => void | Promise<void>;
+type CreateProjectFormProps = {
+  defaultValues?: Partial<CreateProjectFormValues>;
+  onSubmit: (values: CreateProjectFormValues) => void | Promise<void>;
   onCancel?: () => void;
   submitLabel: string;
   pendingLabel?: string;
@@ -25,7 +25,7 @@ type ProjectFormProps = {
   error?: string | null;
 };
 
-const emptyValues: ProjectFormValues = {
+const emptyValues: CreateProjectFormValues = {
   name: "",
   description: "",
 };
@@ -38,14 +38,14 @@ export function ProjectForm({
   pendingLabel = "Saving…",
   isSubmitting = false,
   error,
-}: ProjectFormProps) {
+}: CreateProjectFormProps) {
   return (
-    <Form<ProjectFormValues>
+    <Form<CreateProjectFormValues>
       defaultValues={{ ...emptyValues, ...defaultValues }}
       onSubmit={onSubmit}
     >
-      <FormField<ProjectFormValues> name="name" label="Name">
-        <FormInput<ProjectFormValues>
+      <FormField<CreateProjectFormValues> name="name" label="Name">
+        <FormInput<CreateProjectFormValues>
           name="name"
           placeholder="e.g. InvestingLibrary"
           autoFocus
@@ -59,8 +59,11 @@ export function ProjectForm({
         />
       </FormField>
 
-      <FormField<ProjectFormValues> name="description" label="Description">
-        <FormTextarea<ProjectFormValues>
+      <FormField<CreateProjectFormValues>
+        name="description"
+        label="Description"
+      >
+        <FormTextarea<CreateProjectFormValues>
           name="description"
           placeholder="Optional short summary"
           rows={3}

@@ -17,9 +17,9 @@ import {
   useUpdateProject,
 } from "@/features/projects/queries/projects.queries";
 import type { ProjectStatus } from "@/types/project";
-import styles from "./ProjectInfoForm.module.scss";
+import styles from "./UpdatetProjectForm.module.scss";
 
-type ProjectInfoFormValues = {
+type UpdatetProjectFormValues = {
   name: string;
   description: string;
   status: ProjectStatus;
@@ -30,11 +30,11 @@ const statusOptions = [
   { value: "archived", label: "Archived" },
 ];
 
-type ProjectInfoFormProps = {
+type UpdatetProjectFormProps = {
   projectId: string;
 };
 
-export function ProjectInfoForm({ projectId }: ProjectInfoFormProps) {
+export function UpdatetProjectForm({ projectId }: UpdatetProjectFormProps) {
   const {
     data: project,
     isPending,
@@ -46,7 +46,7 @@ export function ProjectInfoForm({ projectId }: ProjectInfoFormProps) {
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  async function handleSubmit(values: ProjectInfoFormValues) {
+  async function handleSubmit(values: UpdatetProjectFormValues) {
     setFormError(null);
     setSuccessMessage(null);
 
@@ -96,7 +96,7 @@ export function ProjectInfoForm({ projectId }: ProjectInfoFormProps) {
         </p>
       </div>
 
-      <Form<ProjectInfoFormValues>
+      <Form<UpdatetProjectFormValues>
         key={project.id}
         defaultValues={{
           name: project.name,
@@ -105,8 +105,8 @@ export function ProjectInfoForm({ projectId }: ProjectInfoFormProps) {
         }}
         onSubmit={handleSubmit}
       >
-        <FormField<ProjectInfoFormValues> name="name" label="Name">
-          <FormInput<ProjectInfoFormValues>
+        <FormField<UpdatetProjectFormValues> name="name" label="Name">
+          <FormInput<UpdatetProjectFormValues>
             name="name"
             placeholder="e.g. Checkout Flow"
             disabled={updateProject.isPending}
@@ -119,11 +119,11 @@ export function ProjectInfoForm({ projectId }: ProjectInfoFormProps) {
           />
         </FormField>
 
-        <FormField<ProjectInfoFormValues>
+        <FormField<UpdatetProjectFormValues>
           name="description"
           label="Description"
         >
-          <FormTextarea<ProjectInfoFormValues>
+          <FormTextarea<UpdatetProjectFormValues>
             name="description"
             placeholder="Optional short summary"
             rows={4}
@@ -131,8 +131,8 @@ export function ProjectInfoForm({ projectId }: ProjectInfoFormProps) {
           />
         </FormField>
 
-        <FormField<ProjectInfoFormValues> name="status" label="Status">
-          <FormSelect<ProjectInfoFormValues>
+        <FormField<UpdatetProjectFormValues> name="status" label="Status">
+          <FormSelect<UpdatetProjectFormValues>
             name="status"
             options={statusOptions}
             disabled={updateProject.isPending}

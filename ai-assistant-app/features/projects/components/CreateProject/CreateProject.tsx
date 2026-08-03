@@ -10,7 +10,7 @@ import { useCreateProject } from "@/features/projects/queries/projects.queries";
 import {
   ProjectForm,
   type ProjectFormValues,
-} from "@/features/projects/components/ProjectForm";
+} from "@/features/projects/components/CreateProjectForm";
 import styles from "./CreateProject.module.scss";
 
 export function CreateProject() {
