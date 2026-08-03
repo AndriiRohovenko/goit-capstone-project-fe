@@ -26,7 +26,7 @@ export async function updateProject(
   projectId: string,
   payload: UpdateProjectPayload,
 ): Promise<Project> {
-  const { data } = await apiClient.patch<Project>(
+  const { data } = await apiClient.put<Project>(
     `/projects/${projectId}`,
     payload,
   );

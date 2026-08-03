@@ -5,8 +5,8 @@ export type Project = {
   name: string;
   description?: string;
   status?: ProjectStatus;
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type CreateProjectPayload = {
@@ -17,4 +17,5 @@ export type CreateProjectPayload = {
 export type UpdateProjectPayload = {
   name?: string;
   description?: string;
+  status?: ProjectStatus;
 };
