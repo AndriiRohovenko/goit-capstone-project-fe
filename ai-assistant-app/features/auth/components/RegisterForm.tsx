@@ -1,32 +1,42 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { Button } from "@/components/Button";
+import {
+  Form,
+  FormError,
+  FormField,
+  FormInput,
+} from "@/components/Form";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { getApiErrorMessage } from "@/lib/api-error";
 import styles from "./Auth.module.scss";
 
+type RegisterFormValues = {
+  name: string;
+  surname: string;
+  email: string;
+  password: string;
+};
+
 export function RegisterForm() {
   const { register } = useAuth();
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleSubmit(values: RegisterFormValues) {
     setError(null);
     setPending(true);
 
     try {
+      const email = values.email.trim();
       await register({
-        name: name.trim(),
-        surname: surname.trim(),
+        name: values.name.trim(),
+        surname: values.surname.trim(),
         email,
-        password,
+        password: values.password,
       });
       setSubmittedEmail(email);
     } catch (err) {
@@ -42,13 +52,10 @@ export function RegisterForm() {
         <h1 className={styles.title}>Check your email</h1>
         <p className={styles.text}>
           We sent a verification link to{" "}
-          <span className={styles.email}>{submittedEmail}</span>.
-          Open it to verify your account, then sign in.
+          <span className={styles.email}>{submittedEmail}</span>. Open it to
+          verify your account, then sign in.
         </p>
-        <Link
-          href="/login"
-          className={styles.buttonLink}
-        >
+        <Link href="/login" className={styles.buttonLink}>
           Go to sign in
         </Link>
       </div>
@@ -56,67 +63,84 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
+    <Form<RegisterFormValues>
+      className={styles.form}
+      defaultValues={{
+        name: "",
+        surname: "",
+        email: "",
+        password: "",
+      }}
+      onSubmit={handleSubmit}
+    >
       <h1 className={styles.title}>Create account</h1>
 
-      <label className={styles.label}>
-        Name
-        <input
+      <FormField<RegisterFormValues> name="name" label="Name">
+        <FormInput<RegisterFormValues>
+          name="name"
           type="text"
           autoComplete="given-name"
-          required
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          className={styles.input}
+          disabled={pending}
+          rules={{
+            required: "Name is required.",
+            validate: (value) =>
+              (typeof value === "string" && value.trim().length > 0) ||
+              "Name is required.",
+          }}
         />
-      </label>
+      </FormField>
 
-      <label className={styles.label}>
-        Surname
-        <input
+      <FormField<RegisterFormValues> name="surname" label="Surname">
+        <FormInput<RegisterFormValues>
+          name="surname"
           type="text"
           autoComplete="family-name"
-          required
-          value={surname}
-          onChange={(event) => setSurname(event.target.value)}
-          className={styles.input}
+          disabled={pending}
+          rules={{
+            required: "Surname is required.",
+            validate: (value) =>
+              (typeof value === "string" && value.trim().length > 0) ||
+              "Surname is required.",
+          }}
         />
-      </label>
+      </FormField>
 
-      <label className={styles.label}>
-        Email
-        <input
+      <FormField<RegisterFormValues> name="email" label="Email">
+        <FormInput<RegisterFormValues>
+          name="email"
           type="email"
           autoComplete="email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          className={styles.input}
+          disabled={pending}
+          rules={{
+            required: "Email is required.",
+            validate: (value) =>
+              (typeof value === "string" && value.trim().length > 0) ||
+              "Email is required.",
+          }}
         />
-      </label>
+      </FormField>
 
-      <label className={styles.label}>
-        Password
-        <input
+      <FormField<RegisterFormValues> name="password" label="Password">
+        <FormInput<RegisterFormValues>
+          name="password"
           type="password"
           autoComplete="new-password"
-          required
-          minLength={8}
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          className={styles.input}
+          disabled={pending}
+          rules={{
+            required: "Password is required.",
+            minLength: {
+              value: 8,
+              message: "Password must be at least 8 characters.",
+            },
+          }}
         />
-      </label>
+      </FormField>
 
-      {error ? <p className={styles.error}>{error}</p> : null}
+      <FormError message={error} />
 
-      <button
-        type="submit"
-        disabled={pending}
-        className={styles.button}
-      >
+      <Button type="submit" className={styles.submit} disabled={pending}>
         {pending ? "Creating account…" : "Register"}
-      </button>
+      </Button>
 
       <p className={styles.footer}>
         Already have an account?{" "}
@@ -124,6 +148,6 @@ export function RegisterForm() {
           Sign in
         </Link>
       </p>
-    </form>
+    </Form>
   );
 }

@@ -9,7 +9,7 @@ import { getApiErrorMessage } from "@/lib/api-error";
 import { useCreateProject } from "@/features/projects/queries/projects.queries";
 import {
   ProjectForm,
-  type ProjectFormValues,
+  type CreateProjectFormValues,
 } from "@/features/projects/components/CreateProjectForm";
 import styles from "./CreateProject.module.scss";
 
@@ -27,7 +27,7 @@ export function CreateProject() {
     setError(null);
   }
 
-  async function handleSubmit(values: ProjectFormValues) {
+  async function handleSubmit(values: CreateProjectFormValues) {
     setError(null);
 
     try {
