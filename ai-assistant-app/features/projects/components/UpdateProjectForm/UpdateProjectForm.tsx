@@ -17,9 +17,9 @@ import {
   useUpdateProject,
 } from "@/features/projects/queries/projects.queries";
 import type { ProjectStatus } from "@/types/project";
-import styles from "./UpdatetProjectForm.module.scss";
+import styles from "./UpdateProjectForm.module.scss";
 
-type UpdatetProjectFormValues = {
+type UpdateProjectFormValues = {
   name: string;
   description: string;
   status: ProjectStatus;
@@ -30,11 +30,11 @@ const statusOptions = [
   { value: "archived", label: "Archived" },
 ];
 
-type UpdatetProjectFormProps = {
+type UpdateProjectFormProps = {
   projectId: string;
 };
 
-export function UpdatetProjectForm({ projectId }: UpdatetProjectFormProps) {
+export function UpdateProjectForm({ projectId }: UpdateProjectFormProps) {
   const {
     data: project,
     isPending,
@@ -46,7 +46,7 @@ export function UpdatetProjectForm({ projectId }: UpdatetProjectFormProps) {
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  async function handleSubmit(values: UpdatetProjectFormValues) {
+  async function handleSubmit(values: UpdateProjectFormValues) {
     setFormError(null);
     setSuccessMessage(null);
 
@@ -96,7 +96,7 @@ export function UpdatetProjectForm({ projectId }: UpdatetProjectFormProps) {
         </p>
       </div>
 
-      <Form<UpdatetProjectFormValues>
+      <Form<UpdateProjectFormValues>
         key={project.id}
         defaultValues={{
           name: project.name,
@@ -105,8 +105,8 @@ export function UpdatetProjectForm({ projectId }: UpdatetProjectFormProps) {
         }}
         onSubmit={handleSubmit}
       >
-        <FormField<UpdatetProjectFormValues> name="name" label="Name">
-          <FormInput<UpdatetProjectFormValues>
+        <FormField<UpdateProjectFormValues> name="name" label="Name">
+          <FormInput<UpdateProjectFormValues>
             name="name"
             placeholder="e.g. Checkout Flow"
             disabled={updateProject.isPending}
@@ -119,11 +119,11 @@ export function UpdatetProjectForm({ projectId }: UpdatetProjectFormProps) {
           />
         </FormField>
 
-        <FormField<UpdatetProjectFormValues>
+        <FormField<UpdateProjectFormValues>
           name="description"
           label="Description"
         >
-          <FormTextarea<UpdatetProjectFormValues>
+          <FormTextarea<UpdateProjectFormValues>
             name="description"
             placeholder="Optional short summary"
             rows={4}
@@ -131,8 +131,8 @@ export function UpdatetProjectForm({ projectId }: UpdatetProjectFormProps) {
           />
         </FormField>
 
-        <FormField<UpdatetProjectFormValues> name="status" label="Status">
-          <FormSelect<UpdatetProjectFormValues>
+        <FormField<UpdateProjectFormValues> name="status" label="Status">
+          <FormSelect<UpdateProjectFormValues>
             name="status"
             options={statusOptions}
             disabled={updateProject.isPending}

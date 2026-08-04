@@ -2,7 +2,10 @@ import { apiClient } from "@/lib/api-client";
 import type {
   CreateProjectPayload,
   Project,
+  ProjectContext,
   UpdateProjectPayload,
+  UpsertProjectContextPayload,
+  PatchProjectContextPayload,
 } from "@/types/project";
 
 export async function getProjects(): Promise<Project[]> {
@@ -35,4 +38,35 @@ export async function updateProject(
 
 export async function deleteProject(projectId: string): Promise<void> {
   await apiClient.delete(`/projects/${projectId}`);
+}
+
+export async function getProjectContext(
+  projectId: string,
+): Promise<ProjectContext> {
+  const { data } = await apiClient.get<ProjectContext>(
+    `/projects/${projectId}/context`,
+  );
+  return data;
+}
+
+export async function upsertProjectContext(
+  projectId: string,
+  payload: UpsertProjectContextPayload,
+): Promise<ProjectContext> {
+  const { data } = await apiClient.put<ProjectContext>(
+    `/projects/${projectId}/context`,
+    payload,
+  );
+  return data;
+}
+
+export async function patchProjectContext(
+  projectId: string,
+  payload: PatchProjectContextPayload,
+): Promise<ProjectContext> {
+  const { data } = await apiClient.patch<ProjectContext>(
+    `/projects/${projectId}/context`,
+    payload,
+  );
+  return data;
 }

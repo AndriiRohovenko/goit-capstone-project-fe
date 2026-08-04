@@ -1,5 +1,5 @@
 import { ContentPage } from "@/components/ContentPage";
-import { UpdatetProjectForm } from "@/features/projects/components/UpdatetProjectForm/UpdatetProjectForm";
+import { UpdateProjectForm } from "@/features/projects/components/UpdateProjectForm/UpdateProjectForm";
 import styles from "./overview.module.scss";
 
 type ProjectOverviewPageProps = {
@@ -17,7 +17,7 @@ export default async function ProjectOverviewPage({
         <header className={styles.toolbar}>
           <h1 className={styles.title}>Project overview</h1>
         </header>
-        <UpdatetProjectForm projectId={projectId} />
+        <UpdateProjectForm projectId={projectId} />
       </div>
     </ContentPage>
   );
