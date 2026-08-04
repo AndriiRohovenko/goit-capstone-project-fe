@@ -15,7 +15,7 @@ import {
 import { getApiErrorMessage } from "@/lib/api-error";
 import {
   useProjectContext,
-  useUpsertProjectContext,
+  useUpdateProjectContext,
 } from "@/features/projects/queries/projects.queries";
 import styles from "./ProjectContextForm.module.scss";
 
@@ -85,7 +85,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
     error,
     refetch,
   } = useProjectContext(projectId);
-  const upsertContext = useUpsertProjectContext();
+  const updateContext = useUpdateProjectContext();
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -101,7 +101,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
         values.additional_context,
       );
 
-      await upsertContext.mutateAsync({
+      await updateContext.mutateAsync({
         projectId,
         payload: {
           product_description: values.product_description.trim(),
@@ -203,7 +203,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
             name="product_description"
             placeholder="What does this product do?"
             rows={4}
-            disabled={upsertContext.isPending}
+            disabled={updateContext.isPending}
             rules={{
               required: "Product description is required.",
               validate: (value) =>
@@ -217,7 +217,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
           <FormInput<ProjectContextFormValues>
             name="domain"
             placeholder="e.g. fintech, e-commerce"
-            disabled={upsertContext.isPending}
+            disabled={updateContext.isPending}
             rules={{
               required: "Domain is required.",
               validate: (value) =>
@@ -235,7 +235,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
             name="user_roles"
             placeholder={"One role per line, e.g.\nAdmin\nCustomer"}
             rows={3}
-            disabled={upsertContext.isPending}
+            disabled={updateContext.isPending}
           />
         </FormField>
 
@@ -247,7 +247,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
             name="business_rules"
             placeholder={"One rule per line"}
             rows={3}
-            disabled={upsertContext.isPending}
+            disabled={updateContext.isPending}
           />
         </FormField>
 
@@ -258,7 +258,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
           <FormSelect<ProjectContextFormValues>
             name="authentication_type"
             options={authenticationOptions}
-            disabled={upsertContext.isPending}
+            disabled={updateContext.isPending}
             rules={{ required: "Authentication type is required." }}
           />
         </FormField>
@@ -271,7 +271,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
             name="supported_platforms"
             placeholder={"One platform per line, e.g.\nweb\nios\nandroid"}
             rows={3}
-            disabled={upsertContext.isPending}
+            disabled={updateContext.isPending}
           />
         </FormField>
 
@@ -283,7 +283,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
             name="additional_context"
             placeholder='{"priority": "high"}'
             rows={5}
-            disabled={upsertContext.isPending}
+            disabled={updateContext.isPending}
             rules={{
               validate: (value) => {
                 if (typeof value !== "string") {
@@ -308,8 +308,8 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
         ) : null}
 
         <FormActions>
-          <Button type="submit" disabled={upsertContext.isPending}>
-            {upsertContext.isPending ? "Saving…" : "Save context"}
+          <Button type="submit" disabled={updateContext.isPending}>
+            {updateContext.isPending ? "Saving…" : "Save context"}
           </Button>
         </FormActions>
       </Form>

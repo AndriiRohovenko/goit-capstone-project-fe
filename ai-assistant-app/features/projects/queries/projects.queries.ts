@@ -9,13 +9,13 @@ import {
   getProjectContext,
   getProjects,
   updateProject,
-  upsertProjectContext,
+  updateProjectContext,
 } from "@/features/projects/api/projects.api";
 import { projectKeys } from "@/features/projects/queries/projects.keys";
 import type {
   CreateProjectPayload,
   UpdateProjectPayload,
-  UpsertProjectContextPayload,
+  UpdateProjectContextPayload,
 } from "@/types/project";
 
 export function useProjects() {
@@ -75,7 +75,7 @@ export function useUpdateProject() {
   });
 }
 
-export function useUpsertProjectContext() {
+export function useUpdateProjectContext() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -84,8 +84,8 @@ export function useUpsertProjectContext() {
       payload,
     }: {
       projectId: string;
-      payload: UpsertProjectContextPayload;
-    }) => upsertProjectContext(projectId, payload),
+      payload: UpdateProjectContextPayload;
+    }) => updateProjectContext(projectId, payload),
     onSuccess: (_data, { projectId }) => {
       void queryClient.invalidateQueries({
         queryKey: projectKeys.context(projectId),

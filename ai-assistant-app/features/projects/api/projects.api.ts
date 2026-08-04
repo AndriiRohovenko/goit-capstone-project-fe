@@ -4,8 +4,7 @@ import type {
   Project,
   ProjectContext,
   UpdateProjectPayload,
-  UpsertProjectContextPayload,
-  PatchProjectContextPayload,
+  UpdateProjectContextPayload,
 } from "@/types/project";
 
 export async function getProjects(): Promise<Project[]> {
@@ -49,22 +48,11 @@ export async function getProjectContext(
   return data;
 }
 
-export async function upsertProjectContext(
+export async function updateProjectContext(
   projectId: string,
-  payload: UpsertProjectContextPayload,
+  payload: UpdateProjectContextPayload,
 ): Promise<ProjectContext> {
   const { data } = await apiClient.put<ProjectContext>(
-    `/projects/${projectId}/context`,
-    payload,
-  );
-  return data;
-}
-
-export async function patchProjectContext(
-  projectId: string,
-  payload: PatchProjectContextPayload,
-): Promise<ProjectContext> {
-  const { data } = await apiClient.patch<ProjectContext>(
     `/projects/${projectId}/context`,
     payload,
   );

@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
-import { Footer } from "@/components/Footer";
 import { GuestOnly } from "@/features/auth/components/GuestOnly";
 import styles from "./Home.module.scss";
 
@@ -212,7 +211,7 @@ export default function Home() {
           </Link>
         </section>
 
-        <Footer />
+       
       </main>
     </GuestOnly>
   );

@@ -96,97 +96,86 @@ export function ProjectList() {
           <p className={styles.emptyMessage}>No projects yet.</p>
         </div>
       ) : (
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th scope="col">Project Name</th>
-                <th scope="col">Description</th>
-                <th scope="col">Updated</th>
-                <th scope="col">Status</th>
-                <th scope="col" className={styles.actionsCol}>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((project) => (
-                <tr key={project.id}>
-                  <td>
-                    <Link
-                      href={`/dashboard/projects/${project.id}/overview`}
-                      className={styles.projectName}
-                    >
-                      {project.name}
-                    </Link>
-                  </td>
-                  <td className={styles.mutedCell}>
-                    {project.description?.trim() || "—"}
-                  </td>
-                  <td className={styles.mutedCell}>
+        <ul className={styles.list} role="list">
+          {data.map((project) => (
+            <li key={project.id} className={styles.item}>
+              <div className={styles.itemMain}>
+                <Link
+                  href={`/dashboard/projects/${project.id}/requirements`}
+                  className={styles.projectName}
+                >
+                  {project.name}
+                </Link>
+                <p className={styles.description}>
+                  {project.description?.trim() || "No description yet."}
+                </p>
+              </div>
+
+              <div className={styles.itemMeta}>
+                <div className={styles.metaBlock}>
+                  <span className={styles.metaLabel}>Updated</span>
+                  <span className={styles.mutedCell}>
                     {formatRelativeTime(
                       project.updated_at ?? project.created_at,
                     )}
-                  </td>
-                  <td>
-                    <StatusBadge status={project.status} />
-                  </td>
-                  <td className={styles.actionsCol}>
-                    <div
-                      className={styles.actions}
-                      ref={openMenuId === project.id ? menuRef : undefined}
-                    >
+                  </span>
+                </div>
+
+                <div className={styles.metaBlock}>
+                  <span className={styles.metaLabel}>Status</span>
+                  <StatusBadge status={project.status} />
+                </div>
+
+                <div className={styles.actions} ref={openMenuId === project.id ? menuRef : undefined}>
+                  <button
+                    type="button"
+                    className={styles.actionTrigger}
+                    aria-haspopup="menu"
+                    aria-expanded={openMenuId === project.id}
+                    aria-label={`Actions for ${project.name}`}
+                    onClick={(event) => toggleMenu(event, project.id)}
+                  >
+                    <MoreHorizontal size={18} strokeWidth={1.8} />
+                  </button>
+
+                  {openMenuId === project.id ? (
+                    <div className={styles.menu} role="menu">
+                      <Link
+                        href={`/dashboard/projects/${project.id}/overview`}
+                        className={styles.menuItem}
+                        role="menuitem"
+                        onClick={() => setOpenMenuId(null)}
+                      >
+                        <FilePenLine size={16} strokeWidth={1.8} />
+                        Update project details
+                      </Link>
+                      <Link
+                        href={`/dashboard/projects/${project.id}/context`}
+                        className={styles.menuItem}
+                        role="menuitem"
+                        onClick={() => setOpenMenuId(null)}
+                      >
+                        <FolderPen size={16} strokeWidth={1.8} />
+                        Update project context
+                      </Link>
+                      <div className={styles.divider} />
                       <button
                         type="button"
-                        className={styles.actionTrigger}
-                        aria-haspopup="menu"
-                        aria-expanded={openMenuId === project.id}
-                        aria-label={`Actions for ${project.name}`}
-                        onClick={(event) => toggleMenu(event, project.id)}
+                        className={`${styles.menuItem} ${styles.danger}`}
+                        role="menuitem"
+                        disabled={deleteProject.isPending}
+                        onClick={() => void handleDelete(project)}
                       >
-                        <MoreHorizontal size={18} strokeWidth={1.8} />
+                        <Trash2 size={16} strokeWidth={1.8} />
+                        Delete project
                       </button>
-
-                      {openMenuId === project.id ? (
-                        <div className={styles.menu} role="menu">
-                          <Link
-                            href={`/dashboard/projects/${project.id}/overview`}
-                            className={styles.menuItem}
-                            role="menuitem"
-                            onClick={() => setOpenMenuId(null)}
-                          >
-                            <FilePenLine size={16} strokeWidth={1.8} />
-                            Update project details
-                          </Link>
-                          <Link
-                            href={`/dashboard/projects/${project.id}/context`}
-                            className={styles.menuItem}
-                            role="menuitem"
-                            onClick={() => setOpenMenuId(null)}
-                          >
-                            <FolderPen size={16} strokeWidth={1.8} />
-                            Update project context
-                          </Link>
-                          <div className={styles.divider} />
-                          <button
-                            type="button"
-                            className={`${styles.menuItem} ${styles.danger}`}
-                            role="menuitem"
-                            disabled={deleteProject.isPending}
-                            onClick={() => void handleDelete(project)}
-                          >
-                            <Trash2 size={16} strokeWidth={1.8} />
-                            Delete project
-                          </button>
-                        </div>
-                      ) : null}
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  ) : null}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </section>
   );
