@@ -5,8 +5,22 @@ export type Project = {
   name: string;
   description?: string;
   status?: ProjectStatus;
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ProjectContext = {
+  id: string;
+  project_id: string;
+  product_description: string;
+  domain: string;
+  user_roles: string[];
+  business_rules: string[];
+  authentication_type: string;
+  supported_platforms: string[];
+  additional_context: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
 };
 
 export type CreateProjectPayload = {
@@ -17,4 +31,15 @@ export type CreateProjectPayload = {
 export type UpdateProjectPayload = {
   name?: string;
   description?: string;
+  status?: ProjectStatus;
+};
+
+export type UpdateProjectContextPayload = {
+  product_description: string;
+  domain: string;
+  user_roles: string[];
+  business_rules: string[];
+  authentication_type: string;
+  supported_platforms: string[];
+  additional_context: Record<string, unknown>;
 };

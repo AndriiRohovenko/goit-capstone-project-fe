@@ -4,18 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Box,
   ChevronDown,
   ClipboardList,
-  Folder,
-  House,
+  ChevronRight,
   LogOut,
   Settings,
-  SquareChartGantt,
   UserRound,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import { useAuth } from "@/features/auth/context/auth-context";
+
+
 import styles from "./Header.module.scss";
 
 type NavItem = {
@@ -25,9 +24,7 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Projects", icon: Folder, href: "/dashboard/projects" },
-  { label: "Requirements", icon: ClipboardList },
-  { label: "Coverage Analysis", icon: SquareChartGantt },
+  { label: "Projects", icon: ClipboardList, href: "/dashboard/projects" }
 ];
 
 export function Header() {

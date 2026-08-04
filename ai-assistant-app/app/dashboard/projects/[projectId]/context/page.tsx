@@ -1,5 +1,24 @@
-const ProjectContextPage = () => {
-  return <div>ProjectContextPage</div>;
+import { ContentPage } from "@/components/ContentPage";
+import { ProjectContextForm } from "@/features/projects/components/ProjectContextForm";
+import styles from "./context.module.scss";
+
+type ProjectContextPageProps = {
+  params: Promise<{ projectId: string }>;
 };
 
-export default ProjectContextPage;
+export default async function ProjectContextPage({
+  params,
+}: ProjectContextPageProps) {
+  const { projectId } = await params;
+
+  return (
+    <ContentPage>
+      <div className={styles.page}>
+        <header className={styles.toolbar}>
+          <h1 className={styles.title}>Project context</h1>
+        </header>
+        <ProjectContextForm projectId={projectId} />
+      </div>
+    </ContentPage>
+  );
+}

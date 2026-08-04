@@ -1,17 +1,21 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import {
   createProject,
   deleteProject,
   getProject,
+  getProjectContext,
   getProjects,
   updateProject,
+  updateProjectContext,
 } from "@/features/projects/api/projects.api";
 import { projectKeys } from "@/features/projects/queries/projects.keys";
 import type {
   CreateProjectPayload,
   UpdateProjectPayload,
+  UpdateProjectContextPayload,
 } from "@/types/project";
 
 export function useProjects() {
@@ -26,6 +30,20 @@ export function useProject(projectId: string) {
     queryKey: projectKeys.detail(projectId),
     queryFn: () => getProject(projectId),
     enabled: Boolean(projectId),
+  });
+}
+
+export function useProjectContext(projectId: string) {
+  return useQuery({
+    queryKey: projectKeys.context(projectId),
+    queryFn: () => getProjectContext(projectId),
+    enabled: Boolean(projectId),
+    retry: (failureCount, error) => {
+      if (isAxiosError(error) && error.response?.status === 404) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 }
 
@@ -53,6 +71,25 @@ export function useUpdateProject() {
     }) => updateProject(projectId, payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: projectKeys.all });
+    },
+  });
+}
+
+export function useUpdateProjectContext() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      projectId,
+      payload,
+    }: {
+      projectId: string;
+      payload: UpdateProjectContextPayload;
+    }) => updateProjectContext(projectId, payload),
+    onSuccess: (_data, { projectId }) => {
+      void queryClient.invalidateQueries({
+        queryKey: projectKeys.context(projectId),
+      });
     },
   });
 }
