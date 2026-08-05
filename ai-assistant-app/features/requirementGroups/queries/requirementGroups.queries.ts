@@ -1,29 +1,27 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-// import { isAxiosError } from "axios";
 import {
+  createRequirementGroup,
+  deleteRequirementGroup,
+  getRequirementGroup,
   getRequirementGroups,
-    getRequirementGroup,
-    createRequirementGroup,
-    updateRequirementGroup,
-    deleteRequirementGroup
+  updateRequirementGroup,
 } from "@/features/requirementGroups/api/requirementGroups.api";
 import { requirementGroupKeys } from "@/features/requirementGroups/queries/requirementGroups.keys";
-import type {
-  RequirementGroupPayload,
-} from "@/types/requirementGroup";
+import type { RequirementGroupPayload } from "@/types/requirementGroup";
+
 
 export function useRequirementGroups(projectId: string) {
   return useQuery({
-    queryKey: requirementGroupKeys.lists(),
+    queryKey: requirementGroupKeys.lists(projectId),
     queryFn: () => getRequirementGroups(projectId),
   });
 }
 
 export function useRequirementGroup(projectId: string, groupId: string) {
   return useQuery({
-    queryKey: requirementGroupKeys.detail(groupId),
+    queryKey: requirementGroupKeys.detail(projectId, groupId),
     queryFn: () => getRequirementGroup(projectId, groupId),
     enabled: Boolean(groupId),
   });
@@ -36,7 +34,7 @@ export function useCreateRequirementGroup(projectId: string) {
     mutationFn: (payload: RequirementGroupPayload) =>
       createRequirementGroup(projectId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: requirementGroupKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: requirementGroupKeys.lists(projectId) });
     },
   });
 }
@@ -48,8 +46,8 @@ export function useUpdateRequirementGroup(projectId: string, groupId: string) {
     mutationFn: (payload: RequirementGroupPayload) =>
       updateRequirementGroup(projectId, groupId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: requirementGroupKeys.detail(groupId) });
-      queryClient.invalidateQueries({ queryKey: requirementGroupKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: requirementGroupKeys.detail(projectId, groupId) });
+      queryClient.invalidateQueries({ queryKey: requirementGroupKeys.lists(projectId) });
     },
   });
 }
@@ -60,7 +58,7 @@ export function useDeleteRequirementGroup(projectId: string) {
   return useMutation({
     mutationFn: (groupId: string) => deleteRequirementGroup(projectId, groupId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: requirementGroupKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: requirementGroupKeys.lists(projectId) });
     },
   });
 }

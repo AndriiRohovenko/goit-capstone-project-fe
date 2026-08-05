@@ -1,66 +1,61 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-// import { isAxiosError } from "axios";
 import {
-  getRequirementGroups,
-    getRequirementGroup,
-    createRequirementGroup,
-    updateRequirementGroup,
-    deleteRequirementGroup
-} from "@/features/requirementGroups/api/requirementGroups.api";
+  createRequirement,
+  deleteRequirement,
+  getRequirement,
+  getRequirements,
+  updateRequirement,
+} from "@/features/requirements/api/requirements.api";
 import { requirementKeys } from "@/features/requirements/queries/requirement.keys";
-import type {
-  RequirementGroupPayload,
-} from "@/types/requirementGroup";
+import type { RequirementPayload } from "@/types/requirement";
 
-export function useRequirementGroups(projectId: string) {
+export function useRequirements(projectId: string, groupId?: string) {
   return useQuery({
-    queryKey: requirementKeys.lists(),
-    queryFn: () => getRequirementGroups(projectId),
+    queryKey: requirementKeys.lists(projectId),
+    queryFn: () => getRequirements(projectId, groupId),
   });
 }
 
-export function useRequirementGroup(projectId: string, groupId: string) {
+export function useRequirement(projectId: string, requirementId: string) {
   return useQuery({
-    queryKey: requirementKeys.detail(groupId),
-    queryFn: () => getRequirementGroup(projectId, groupId),
-    enabled: Boolean(groupId),
+    queryKey: requirementKeys.detail(projectId, requirementId),
+    queryFn: () => getRequirement(projectId, requirementId),
+    enabled: Boolean(requirementId),
   });
 }
 
-export function useCreateRequirementGroup(projectId: string) {
+export function useCreateRequirement(projectId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: RequirementGroupPayload) =>
-      createRequirementGroup(projectId, payload),
+    mutationFn: (payload: RequirementPayload) => createRequirement(projectId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: requirementKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.lists(projectId) });
     },
   });
 }
 
-export function useUpdateRequirementGroup(projectId: string, groupId: string) {
+export function useUpdateRequirement(projectId: string, requirementId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: RequirementGroupPayload) =>
-      updateRequirementGroup(projectId, groupId, payload),
+    mutationFn: (payload: RequirementPayload) => updateRequirement(projectId, requirementId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: requirementKeys.detail(groupId) });
-      queryClient.invalidateQueries({ queryKey: requirementKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.detail(projectId, requirementId) });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.lists(projectId) });
     },
   });
 }
 
-export function useDeleteRequirementGroup(projectId: string) {
+export function useDeleteRequirement(projectId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (groupId: string) => deleteRequirementGroup(projectId, groupId),
+    mutationFn: (requirementId: string) => deleteRequirement(projectId, requirementId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: requirementKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.lists(projectId) });
     },
   });
 }

@@ -1,4 +1,3 @@
-import { ContentPage } from "@/components/ContentPage";
 import { UpdateProjectForm } from "@/features/projects/components/UpdateProjectForm/UpdateProjectForm";
 import styles from "./overview.module.scss";
 
@@ -12,13 +11,11 @@ export default async function ProjectOverviewPage({
   const { projectId } = await params;
 
   return (
-    <ContentPage>
-      <div className={styles.page}>
-        <header className={styles.toolbar}>
-          <h1 className={styles.title}>Project overview</h1>
-        </header>
-        <UpdateProjectForm projectId={projectId} />
-      </div>
-    </ContentPage>
+    <div className={styles.page}>
+      <header className={styles.toolbar}>
+        <h1 className={styles.title}>Project overview</h1>
+      </header>
+      <UpdateProjectForm projectId={projectId} />
+    </div>
   );
 }

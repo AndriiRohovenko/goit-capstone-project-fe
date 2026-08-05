@@ -1,8 +1,9 @@
 import { apiClient } from "@/lib/api-client";
 import type {Requirement, RequirementPayload} from "@/types/requirement";
 
-export async function getRequirements(projectId: string, groupId: string): Promise<Requirement[]> {
-  const response = await apiClient.get(`/projects/${projectId}/requirements?group_id=${groupId}`);
+export async function getRequirements(projectId: string, groupId?: string): Promise<Requirement[]> {
+  const query = groupId ? `?group_id=${groupId}` : "";
+  const response = await apiClient.get(`/projects/${projectId}/requirements${query}`);
   return response.data;
 }
 
