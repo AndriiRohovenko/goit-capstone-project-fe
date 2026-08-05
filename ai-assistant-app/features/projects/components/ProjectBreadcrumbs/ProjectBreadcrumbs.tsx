@@ -34,8 +34,7 @@ export function ProjectBreadcrumbs({ projectId, children }: ProjectBreadcrumbsPr
         items={[
           { label: "Projects", href: "/dashboard/projects" },
           {
-            label: project?.name ?? "Project",
-            href: `/dashboard/projects/${projectId}/overview`,
+            label: project?.name ?? "Project"
           },
           { label: currentLabel },
         ]}

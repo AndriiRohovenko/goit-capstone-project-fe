@@ -33,7 +33,7 @@ const emptyValues: CreateRequirementFormValues = {
   title: "",
   description: "",
   groupId: "",
-  requirementType: "functional",
+  requirementType: "feature",
   priority: "medium",
   status: "draft",
   acceptanceCriteria: "",
@@ -41,8 +41,11 @@ const emptyValues: CreateRequirementFormValues = {
 };
 
 const requirementTypeOptions = [
-  { value: "functional", label: "Functional" },
-  { value: "non-functional", label: "Non-Functional" },
+  { value: "user_story", label: "User story" },
+  { value: "feature", label: "Feature" },
+  { value: "api", label: "API" },
+  { value: "business_requirement", label: "Business requirement" },
+  { value: "other", label: "Other" },
 ];
 
 const priorityOptions = [
