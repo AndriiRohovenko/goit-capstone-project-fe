@@ -263,11 +263,12 @@ function priorityTone(priority: string) {
 
 function statusTone(status: string) {
   switch (status.toLowerCase()) {
-    case "approved":
+    case "analyzed":
       return "statusApproved";
-    case "in-review":
-    case "in review":
+    case "ready":
       return "statusReview";
+    case "archived":
+      return "statusArchived";
     default:
       return "statusDraft";
   }

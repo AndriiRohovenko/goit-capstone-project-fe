@@ -1,65 +1,116 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Pencil } from "lucide-react";
 import { Button } from "@/components/Button";
 import {
   Form,
   FormActions,
   FormError,
   FormField,
+  FormSelect,
   FormTextarea,
 } from "@/components/Form";
 import { useUpdateRequirement } from "@/features/requirements/queries/requirement.queries";
 import { getApiErrorMessage } from "@/lib/api-error";
 import type { Requirement, RequirementPayload } from "@/types/requirement";
+import type { RequirementGroup } from "@/types/requirementGroup";
 import styles from "./RequirementDetailsForm.module.scss";
 
 type RequirementDetailsFormProps = {
   projectId: string;
   requirement: Requirement;
+  groups?: RequirementGroup[];
 };
 
-type DetailSection = "description" | "acceptance" | "rules";
-
-type TextFieldFormValues = {
-  value: string;
+type RequirementDetailsFormValues = {
+  group_id: string;
+  requirement_type: string;
+  priority: string;
+  status: string;
+  description: string;
+  acceptance_criteria: string;
+  business_rules: string;
 };
+
+type RequirementTab = "details" | "artifacts" | "test_coverage";
+
+const requirementTypeOptions = [
+  { value: "user_story", label: "User story" },
+  { value: "feature", label: "Feature" },
+  { value: "api", label: "API" },
+  { value: "business_requirement", label: "Business requirement" },
+  { value: "other", label: "Other" },
+];
+
+const priorityOptions = [
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium" },
+  { value: "high", label: "High" },
+];
+
+const statusOptions = [
+  { value: "draft", label: "Draft" },
+  { value: "ready", label: "Ready" },
+  { value: "analyzed", label: "Analyzed" },
+  { value: "archived", label: "Archived" },
+];
 
 export function RequirementDetailsForm({
   projectId,
   requirement,
+  groups,
 }: RequirementDetailsFormProps) {
   const updateRequirement = useUpdateRequirement(projectId, requirement.id);
-  const [editingSection, setEditingSection] = useState<DetailSection | null>(null);
+  const [activeTab, setActiveTab] = useState<RequirementTab>("details");
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const payloadBase = useMemo(() => toRequirementPayload(requirement), [requirement]);
 
-  async function updateSection(section: DetailSection, value: string) {
+  const groupOptions = useMemo(() => {
+    const baseOptions =
+      groups?.map((group) => ({ value: group.id, label: group.name })) ?? [];
+
+    if (!baseOptions.some((option) => option.value === requirement.group_id)) {
+      baseOptions.push({
+        value: requirement.group_id,
+        label: requirement.group_id ? "Current group" : "No group",
+      });
+    }
+
+    return baseOptions;
+  }, [groups, requirement.group_id]);
+
+  const defaultValues: RequirementDetailsFormValues = useMemo(
+    () => ({
+      group_id: requirement.group_id,
+      requirement_type: requirement.requirement_type || "feature",
+      priority: requirement.priority || "medium",
+      status: requirement.status || "draft",
+      description: requirement.description ?? "",
+      acceptance_criteria: joinLines(requirement.acceptance_criteria),
+      business_rules: joinLines(requirement.business_rules),
+    }),
+    [requirement],
+  );
+
+  async function handleSubmit(values: RequirementDetailsFormValues) {
     setFormError(null);
     setSuccessMessage(null);
 
     const nextPayload: RequirementPayload = {
       ...payloadBase,
+      group_id: values.group_id,
+      requirement_type: values.requirement_type,
+      priority: values.priority,
+      status: values.status,
+      description: values.description.trim(),
+      acceptance_criteria: splitLines(values.acceptance_criteria),
+      business_rules: splitLines(values.business_rules),
     };
-
-    if (section === "description") {
-      nextPayload.description = value.trim();
-    }
-
-    if (section === "acceptance") {
-      nextPayload.acceptance_criteria = splitLines(value);
-    }
-
-    if (section === "rules") {
-      nextPayload.business_rules = splitLines(value);
-    }
 
     try {
       await updateRequirement.mutateAsync(nextPayload);
-      setEditingSection(null);
       setSuccessMessage("Details updated.");
     } catch (err) {
       setFormError(getApiErrorMessage(err, "Failed to update requirement."));
@@ -69,172 +120,133 @@ export function RequirementDetailsForm({
   return (
     <section className={styles.card}>
       <div className={styles.tabs}>
-        <button type="button" className={`${styles.tab} ${styles.tabActive}`}>
+        <button
+          type="button"
+          className={`${styles.tab} ${activeTab === "details" ? styles.tabActive : ""}`}
+          onClick={() => setActiveTab("details")}
+        >
           Details
+        </button>
+        <button
+          type="button"
+          className={`${styles.tab} ${activeTab === "artifacts" ? styles.tabActive : ""}`}
+          onClick={() => setActiveTab("artifacts")}
+        >
+          Artifacts
+        </button>
+        <button
+          type="button"
+          className={`${styles.tab} ${activeTab === "test_coverage" ? styles.tabActive : ""}`}
+          onClick={() => setActiveTab("test_coverage")}
+        >
+          Test Coverage
         </button>
       </div>
 
-      <EditableTextSection
-        title="Description"
-        text={requirement.description?.trim() || "No description yet."}
-        isEditing={editingSection === "description"}
-        canEdit={editingSection === null || editingSection === "description"}
-        pending={updateRequirement.isPending}
-        onEdit={() => {
-          setFormError(null);
-          setSuccessMessage(null);
-          setEditingSection("description");
-        }}
-        onCancel={() => {
-          if (updateRequirement.isPending) {
-            return;
-          }
-          setEditingSection(null);
-          setFormError(null);
-        }}
-        defaultValue={requirement.description ?? ""}
-        placeholder="Describe the requirement"
-        onSubmit={(value) => updateSection("description", value)}
-      />
-
-      <EditableTextSection
-        title="Acceptance Criteria"
-        text={displayList(requirement.acceptance_criteria)}
-        isList
-        isEditing={editingSection === "acceptance"}
-        canEdit={editingSection === null || editingSection === "acceptance"}
-        pending={updateRequirement.isPending}
-        onEdit={() => {
-          setFormError(null);
-          setSuccessMessage(null);
-          setEditingSection("acceptance");
-        }}
-        onCancel={() => {
-          if (updateRequirement.isPending) {
-            return;
-          }
-          setEditingSection(null);
-          setFormError(null);
-        }}
-        defaultValue={joinLines(requirement.acceptance_criteria)}
-        placeholder="One criterion per line"
-        onSubmit={(value) => updateSection("acceptance", value)}
-      />
-
-      <EditableTextSection
-        title="Business Rules"
-        text={displayList(requirement.business_rules)}
-        isList
-        isEditing={editingSection === "rules"}
-        canEdit={editingSection === null || editingSection === "rules"}
-        pending={updateRequirement.isPending}
-        onEdit={() => {
-          setFormError(null);
-          setSuccessMessage(null);
-          setEditingSection("rules");
-        }}
-        onCancel={() => {
-          if (updateRequirement.isPending) {
-            return;
-          }
-          setEditingSection(null);
-          setFormError(null);
-        }}
-        defaultValue={joinLines(requirement.business_rules)}
-        placeholder="One rule per line"
-        onSubmit={(value) => updateSection("rules", value)}
-      />
-
-      <FormError message={formError} />
-      {successMessage ? <p className={styles.success}>{successMessage}</p> : null}
-    </section>
-  );
-}
-
-function EditableTextSection({
-  title,
-  text,
-  isEditing,
-  canEdit,
-  pending,
-  isList = false,
-  defaultValue,
-  placeholder,
-  onEdit,
-  onCancel,
-  onSubmit,
-}: {
-  title: string;
-  text: string;
-  isEditing: boolean;
-  canEdit: boolean;
-  pending: boolean;
-  isList?: boolean;
-  defaultValue: string;
-  placeholder: string;
-  onEdit: () => void;
-  onCancel: () => void;
-  onSubmit: (value: string) => void | Promise<void>;
-}) {
-  return (
-    <section className={styles.section}>
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>{title}</h2>
-        {!isEditing ? (
-          <button
-            type="button"
-            className={styles.editButton}
-            onClick={onEdit}
-            disabled={!canEdit || pending}
-          >
-            <Pencil size={14} strokeWidth={2} />
-            Edit
-          </button>
-        ) : null}
-      </div>
-
-      {isEditing ? (
-        <Form<TextFieldFormValues>
-          defaultValues={{ value: defaultValue }}
-          onSubmit={({ value }) => onSubmit(value)}
+      {activeTab === "details" ? (
+        <Form<RequirementDetailsFormValues>
+          key={requirement.updated_at}
+          defaultValues={defaultValues}
+          onSubmit={handleSubmit}
         >
-          <FormField<TextFieldFormValues> name="value" label={title}>
-            <FormTextarea<TextFieldFormValues>
-              name="value"
-              rows={isList ? 5 : 4}
-              placeholder={placeholder}
-              disabled={pending}
-            />
-          </FormField>
+          <section className={styles.section}>
+            <FormField<RequirementDetailsFormValues> name="group_id" label="Group">
+              <FormSelect<RequirementDetailsFormValues>
+                name="group_id"
+                options={groupOptions}
+                disabled={updateRequirement.isPending}
+              />
+            </FormField>
 
-          <FormActions>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={onCancel}
-              disabled={pending}
+            <FormField<RequirementDetailsFormValues>
+              name="requirement_type"
+              label="Requirement Type"
             >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={pending}>
-              {pending ? "Saving..." : "Save"}
-            </Button>
-          </FormActions>
+              <FormSelect<RequirementDetailsFormValues>
+                name="requirement_type"
+                options={ensureOption(requirementTypeOptions, defaultValues.requirement_type)}
+                disabled={updateRequirement.isPending}
+              />
+            </FormField>
+
+            <FormField<RequirementDetailsFormValues> name="priority" label="Priority">
+              <FormSelect<RequirementDetailsFormValues>
+                name="priority"
+                options={ensureOption(priorityOptions, defaultValues.priority)}
+                disabled={updateRequirement.isPending}
+              />
+            </FormField>
+
+            <FormField<RequirementDetailsFormValues> name="status" label="Status">
+              <FormSelect<RequirementDetailsFormValues>
+                name="status"
+                options={ensureOption(statusOptions, defaultValues.status)}
+                disabled={updateRequirement.isPending}
+              />
+            </FormField>
+          </section>
+
+          <section className={styles.section}>
+            <FormField<RequirementDetailsFormValues>
+              name="description"
+              label="Description"
+            >
+              <FormTextarea<RequirementDetailsFormValues>
+                name="description"
+                rows={4}
+                placeholder="Describe the requirement"
+                disabled={updateRequirement.isPending}
+              />
+            </FormField>
+          </section>
+
+          <section className={styles.section}>
+            <FormField<RequirementDetailsFormValues>
+              name="acceptance_criteria"
+              label="Acceptance Criteria"
+            >
+              <FormTextarea<RequirementDetailsFormValues>
+                name="acceptance_criteria"
+                rows={5}
+                placeholder="One criterion per line"
+                disabled={updateRequirement.isPending}
+              />
+            </FormField>
+          </section>
+
+          <section className={styles.section}>
+            <FormField<RequirementDetailsFormValues>
+              name="business_rules"
+              label="Business Rules"
+            >
+              <FormTextarea<RequirementDetailsFormValues>
+                name="business_rules"
+                rows={5}
+                placeholder="One rule per line"
+                disabled={updateRequirement.isPending}
+              />
+            </FormField>
+          </section>
+
+          <section className={styles.section}>
+            <FormActions>
+              <Button type="submit" disabled={updateRequirement.isPending}>
+                {updateRequirement.isPending ? "Saving..." : "Update details"}
+              </Button>
+            </FormActions>
+          </section>
+
+          <FormError message={formError} />
+          {successMessage ? <p className={styles.success}>{successMessage}</p> : null}
         </Form>
-      ) : isList ? (
-        <ul className={styles.list}>
-          {text
-            .split("\n")
-            .map((line) => line.trim())
-            .filter(Boolean)
-            .map((line, index) => (
-              <li key={`${title}-${index}`} className={styles.listItem}>
-                {line}
-              </li>
-            ))}
-        </ul>
       ) : (
-        <p className={styles.paragraph}>{text}</p>
+        <section className={styles.section}>
+          <p className={styles.mockedMessage}>
+            {activeTab === "artifacts"
+              ? "Artifacts section is coming soon."
+              : "Test Coverage section is coming soon."}
+          </p>
+        </section>
       )}
     </section>
   );
@@ -251,12 +263,25 @@ function joinLines(values: string[] | undefined, separator = "\n"): string {
   return values?.length ? values.join(separator) : "";
 }
 
-function displayList(values: string[] | undefined): string {
-  if (!values?.length) {
-    return "No entries yet.";
+function ensureOption(
+  options: Array<{ value: string; label: string }>,
+  value: string,
+) {
+  if (!value) {
+    return options;
   }
 
-  return values.join("\n");
+  if (options.some((option) => option.value === value)) {
+    return options;
+  }
+
+  return [
+    ...options,
+    {
+      value,
+      label: value,
+    },
+  ];
 }
 
 function toRequirementPayload(requirement: Requirement): RequirementPayload {

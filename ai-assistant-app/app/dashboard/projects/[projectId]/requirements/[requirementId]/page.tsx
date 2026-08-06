@@ -54,7 +54,11 @@ function RequirementPageContent({
                 groupName={groupName}
             />
 
-            <RequirementDetailsForm projectId={projectId} requirement={requirement} />
+            <RequirementDetailsForm
+                projectId={projectId}
+                requirement={requirement}
+                groups={groups}
+            />
         </div>
     );
 }

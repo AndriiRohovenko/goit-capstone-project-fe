@@ -56,8 +56,9 @@ const priorityOptions = [
 
 const statusOptions = [
   { value: "draft", label: "Draft" },
-  { value: "in-review", label: "In Review" },
-  { value: "approved", label: "Approved" },
+  { value: "ready", label: "Ready" },
+  { value: "analyzed", label: "Analyzed" },
+  { value: "archived", label: "Archived" },
 ];
 
 type CreateRequirementProps = {
