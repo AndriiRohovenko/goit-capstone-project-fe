@@ -35,11 +35,11 @@ export type UpdateProjectPayload = {
 };
 
 export type UpdateProjectContextPayload = {
-  product_description: string;
-  domain: string;
-  user_roles: string[];
-  business_rules: string[];
-  authentication_type: string;
-  supported_platforms: string[];
-  additional_context: Record<string, unknown>;
+  product_description?: string;
+  domain?: string;
+  user_roles?: string[];
+  business_rules?: string[];
+  authentication_type?: string;
+  supported_platforms?: string[];
+  additional_context?: Record<string, unknown>;
 };

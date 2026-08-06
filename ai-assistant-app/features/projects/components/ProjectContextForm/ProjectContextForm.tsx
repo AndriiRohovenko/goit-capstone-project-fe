@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Pencil } from "lucide-react";
 import { isAxiosError } from "axios";
 import { Button } from "@/components/Button";
 import {
@@ -17,6 +18,7 @@ import {
   useProjectContext,
   useUpdateProjectContext,
 } from "@/features/projects/queries/projects.queries";
+import type { UpdateProjectContextPayload } from "@/types/project";
 import styles from "./ProjectContextForm.module.scss";
 
 type ProjectContextFormValues = {
@@ -31,6 +33,23 @@ type ProjectContextFormValues = {
 
 type ProjectContextFormProps = {
   projectId: string;
+};
+
+type ContextFieldKey =
+  | "product_description"
+  | "domain"
+  | "user_roles"
+  | "business_rules"
+  | "authentication_type"
+  | "supported_platforms"
+  | "additional_context";
+
+type TextFormValues = {
+  value: string;
+};
+
+type SelectFormValues = {
+  value: string;
 };
 
 const authTypeOptions = [
@@ -86,34 +105,51 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
     refetch,
   } = useProjectContext(projectId);
   const updateContext = useUpdateProjectContext();
+  const [editingField, setEditingField] = useState<ContextFieldKey | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const isMissingContext =
     isAxiosError(error) && error.response?.status === 404;
 
-  async function handleSubmit(values: ProjectContextFormValues) {
+  async function handleSubmitField(
+    field: ContextFieldKey,
+    value: string,
+  ) {
     setFormError(null);
     setSuccessMessage(null);
 
     try {
-      const additionalContext = parseAdditionalContext(
-        values.additional_context,
-      );
+      const payload: UpdateProjectContextPayload = {};
+
+      if (field === "product_description") {
+        payload.product_description = value.trim();
+      }
+      if (field === "domain") {
+        payload.domain = value.trim();
+      }
+      if (field === "user_roles") {
+        payload.user_roles = splitList(value);
+      }
+      if (field === "business_rules") {
+        payload.business_rules = splitList(value);
+      }
+      if (field === "authentication_type") {
+        payload.authentication_type = value;
+      }
+      if (field === "supported_platforms") {
+        payload.supported_platforms = splitList(value);
+      }
+      if (field === "additional_context") {
+        payload.additional_context = parseAdditionalContext(value);
+      }
 
       await updateContext.mutateAsync({
         projectId,
-        payload: {
-          product_description: values.product_description.trim(),
-          domain: values.domain.trim(),
-          user_roles: splitList(values.user_roles),
-          business_rules: splitList(values.business_rules),
-          authentication_type: values.authentication_type,
-          supported_platforms: splitList(values.supported_platforms),
-          additional_context: additionalContext,
-        },
+        payload,
       });
-      setSuccessMessage("Project context saved.");
+      setEditingField(null);
+      setSuccessMessage("Project context updated.");
     } catch (err) {
       if (err instanceof SyntaxError) {
         setFormError("Additional context must be valid JSON.");
@@ -190,129 +226,394 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
         </p>
       </div>
 
-      <Form<ProjectContextFormValues>
-        key={projectContext?.id ?? `new-${projectId}`}
-        defaultValues={defaultValues}
-        onSubmit={handleSubmit}
-      >
-        <FormField<ProjectContextFormValues>
-          name="product_description"
-          label="Product description"
-        >
-          <FormTextarea<ProjectContextFormValues>
-            name="product_description"
-            placeholder="What does this product do?"
-            rows={4}
-            disabled={updateContext.isPending}
-            rules={{
-              required: "Product description is required.",
-              validate: (value) =>
-                (typeof value === "string" && value.trim().length > 0) ||
-                "Product description is required.",
-            }}
-          />
-        </FormField>
+      <EditableTextContextSection
+        title="Product description"
+        value={defaultValues.product_description}
+        placeholder="What does this product do?"
+        rows={4}
+        isEditing={editingField === "product_description"}
+        canEdit={editingField === null || editingField === "product_description"}
+        pending={updateContext.isPending}
+        onEdit={() => {
+          setFormError(null);
+          setSuccessMessage(null);
+          setEditingField("product_description");
+        }}
+        onCancel={() => {
+          if (!updateContext.isPending) {
+            setEditingField(null);
+          }
+        }}
+        onSubmit={(value) => handleSubmitField("product_description", value)}
+      />
 
-        <FormField<ProjectContextFormValues> name="domain" label="Domain">
-          <FormInput<ProjectContextFormValues>
-            name="domain"
-            placeholder="e.g. fintech, e-commerce"
-            disabled={updateContext.isPending}
-            rules={{
-              required: "Domain is required.",
-              validate: (value) =>
-                (typeof value === "string" && value.trim().length > 0) ||
-                "Domain is required.",
-            }}
-          />
-        </FormField>
+      <EditableInputContextSection
+        title="Domain"
+        value={defaultValues.domain}
+        placeholder="e.g. fintech, e-commerce"
+        isEditing={editingField === "domain"}
+        canEdit={editingField === null || editingField === "domain"}
+        pending={updateContext.isPending}
+        onEdit={() => {
+          setFormError(null);
+          setSuccessMessage(null);
+          setEditingField("domain");
+        }}
+        onCancel={() => {
+          if (!updateContext.isPending) {
+            setEditingField(null);
+          }
+        }}
+        onSubmit={(value) => handleSubmitField("domain", value)}
+      />
 
-        <FormField<ProjectContextFormValues>
-          name="user_roles"
-          label="User roles"
-        >
-          <FormTextarea<ProjectContextFormValues>
-            name="user_roles"
-            placeholder={"One role per line, e.g.\nAdmin\nCustomer"}
-            rows={3}
-            disabled={updateContext.isPending}
-          />
-        </FormField>
+      <EditableTextContextSection
+        title="User roles"
+        value={defaultValues.user_roles}
+        placeholder={"One role per line"}
+        rows={3}
+        asList
+        isEditing={editingField === "user_roles"}
+        canEdit={editingField === null || editingField === "user_roles"}
+        pending={updateContext.isPending}
+        onEdit={() => {
+          setFormError(null);
+          setSuccessMessage(null);
+          setEditingField("user_roles");
+        }}
+        onCancel={() => {
+          if (!updateContext.isPending) {
+            setEditingField(null);
+          }
+        }}
+        onSubmit={(value) => handleSubmitField("user_roles", value)}
+      />
 
-        <FormField<ProjectContextFormValues>
-          name="business_rules"
-          label="Business rules"
-        >
-          <FormTextarea<ProjectContextFormValues>
-            name="business_rules"
-            placeholder={"One rule per line"}
-            rows={3}
-            disabled={updateContext.isPending}
-          />
-        </FormField>
+      <EditableTextContextSection
+        title="Business rules"
+        value={defaultValues.business_rules}
+        placeholder={"One rule per line"}
+        rows={3}
+        asList
+        isEditing={editingField === "business_rules"}
+        canEdit={editingField === null || editingField === "business_rules"}
+        pending={updateContext.isPending}
+        onEdit={() => {
+          setFormError(null);
+          setSuccessMessage(null);
+          setEditingField("business_rules");
+        }}
+        onCancel={() => {
+          if (!updateContext.isPending) {
+            setEditingField(null);
+          }
+        }}
+        onSubmit={(value) => handleSubmitField("business_rules", value)}
+      />
 
-        <FormField<ProjectContextFormValues>
-          name="authentication_type"
-          label="Authentication type"
-        >
-          <FormSelect<ProjectContextFormValues>
-            name="authentication_type"
-            options={authenticationOptions}
-            disabled={updateContext.isPending}
-            rules={{ required: "Authentication type is required." }}
-          />
-        </FormField>
+      <EditableSelectContextSection
+        title="Authentication type"
+        value={defaultValues.authentication_type}
+        options={authenticationOptions}
+        isEditing={editingField === "authentication_type"}
+        canEdit={editingField === null || editingField === "authentication_type"}
+        pending={updateContext.isPending}
+        onEdit={() => {
+          setFormError(null);
+          setSuccessMessage(null);
+          setEditingField("authentication_type");
+        }}
+        onCancel={() => {
+          if (!updateContext.isPending) {
+            setEditingField(null);
+          }
+        }}
+        onSubmit={(value) => handleSubmitField("authentication_type", value)}
+      />
 
-        <FormField<ProjectContextFormValues>
-          name="supported_platforms"
-          label="Supported platforms"
-        >
-          <FormTextarea<ProjectContextFormValues>
-            name="supported_platforms"
-            placeholder={"One platform per line, e.g.\nweb\nios\nandroid"}
-            rows={3}
-            disabled={updateContext.isPending}
-          />
-        </FormField>
+      <EditableTextContextSection
+        title="Supported platforms"
+        value={defaultValues.supported_platforms}
+        placeholder={"One platform per line"}
+        rows={3}
+        asList
+        isEditing={editingField === "supported_platforms"}
+        canEdit={editingField === null || editingField === "supported_platforms"}
+        pending={updateContext.isPending}
+        onEdit={() => {
+          setFormError(null);
+          setSuccessMessage(null);
+          setEditingField("supported_platforms");
+        }}
+        onCancel={() => {
+          if (!updateContext.isPending) {
+            setEditingField(null);
+          }
+        }}
+        onSubmit={(value) => handleSubmitField("supported_platforms", value)}
+      />
 
-        <FormField<ProjectContextFormValues>
-          name="additional_context"
-          label="Additional context (JSON)"
-        >
-          <FormTextarea<ProjectContextFormValues>
-            name="additional_context"
-            placeholder='{"priority": "high"}'
-            rows={5}
-            disabled={updateContext.isPending}
-            rules={{
-              validate: (value) => {
-                if (typeof value !== "string") {
-                  return "Additional context must be valid JSON.";
-                }
-                try {
-                  parseAdditionalContext(value);
-                  return true;
-                } catch (err) {
-                  return err instanceof Error
-                    ? err.message
-                    : "Additional context must be valid JSON.";
-                }
-              },
-            }}
-          />
-        </FormField>
+      <EditableTextContextSection
+        title="Additional context (JSON)"
+        value={defaultValues.additional_context}
+        placeholder='{"priority": "high"}'
+        rows={5}
+        isEditing={editingField === "additional_context"}
+        canEdit={editingField === null || editingField === "additional_context"}
+        pending={updateContext.isPending}
+        onEdit={() => {
+          setFormError(null);
+          setSuccessMessage(null);
+          setEditingField("additional_context");
+        }}
+        onCancel={() => {
+          if (!updateContext.isPending) {
+            setEditingField(null);
+          }
+        }}
+        onSubmit={(value) => handleSubmitField("additional_context", value)}
+      />
 
-        <FormError message={formError} />
-        {successMessage ? (
-          <p className={styles.success}>{successMessage}</p>
-        ) : null}
-
-        <FormActions>
-          <Button type="submit" disabled={updateContext.isPending}>
-            {updateContext.isPending ? "Saving…" : "Save context"}
-          </Button>
-        </FormActions>
-      </Form>
+      <FormError message={formError} />
+      {successMessage ? <p className={styles.success}>{successMessage}</p> : null}
     </div>
+  );
+}
+
+function EditableTextContextSection({
+  title,
+  value,
+  placeholder,
+  rows,
+  asList = false,
+  isEditing,
+  canEdit,
+  pending,
+  onEdit,
+  onCancel,
+  onSubmit,
+}: {
+  title: string;
+  value: string;
+  placeholder: string;
+  rows: number;
+  asList?: boolean;
+  isEditing: boolean;
+  canEdit: boolean;
+  pending: boolean;
+  onEdit: () => void;
+  onCancel: () => void;
+  onSubmit: (value: string) => void | Promise<void>;
+}) {
+  return (
+    <section className={styles.section}>
+      <div className={styles.sectionHeader}>
+        <h3 className={styles.sectionTitle}>{title}</h3>
+        {!isEditing ? (
+          <button
+            type="button"
+            className={styles.editButton}
+            onClick={onEdit}
+            disabled={!canEdit || pending}
+          >
+            <Pencil size={14} strokeWidth={2} />
+            Edit
+          </button>
+        ) : null}
+      </div>
+
+      {isEditing ? (
+        <Form<TextFormValues>
+          defaultValues={{ value }}
+          onSubmit={({ value: nextValue }) => onSubmit(nextValue)}
+        >
+          <FormField<TextFormValues> name="value" label={title}>
+            <FormTextarea<TextFormValues>
+              name="value"
+              placeholder={placeholder}
+              rows={rows}
+              disabled={pending}
+            />
+          </FormField>
+
+          <FormActions>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onCancel}
+              disabled={pending}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={pending}>
+              {pending ? "Saving..." : "Save"}
+            </Button>
+          </FormActions>
+        </Form>
+      ) : asList ? (
+        value.trim() ? (
+          <ul className={styles.listValue}>
+            {value
+              .split(/\r?\n/)
+              .map((line) => line.trim())
+              .filter(Boolean)
+              .map((line, index) => (
+                <li key={`${title}-${index}`}>{line}</li>
+              ))}
+          </ul>
+        ) : (
+          <p className={styles.textValue}>No value yet.</p>
+        )
+      ) : (
+        <p className={styles.textValue}>{value || "No value yet."}</p>
+      )}
+    </section>
+  );
+}
+
+function EditableInputContextSection({
+  title,
+  value,
+  placeholder,
+  isEditing,
+  canEdit,
+  pending,
+  onEdit,
+  onCancel,
+  onSubmit,
+}: {
+  title: string;
+  value: string;
+  placeholder: string;
+  isEditing: boolean;
+  canEdit: boolean;
+  pending: boolean;
+  onEdit: () => void;
+  onCancel: () => void;
+  onSubmit: (value: string) => void | Promise<void>;
+}) {
+  return (
+    <section className={styles.section}>
+      <div className={styles.sectionHeader}>
+        <h3 className={styles.sectionTitle}>{title}</h3>
+        {!isEditing ? (
+          <button
+            type="button"
+            className={styles.editButton}
+            onClick={onEdit}
+            disabled={!canEdit || pending}
+          >
+            <Pencil size={14} strokeWidth={2} />
+            Edit
+          </button>
+        ) : null}
+      </div>
+
+      {isEditing ? (
+        <Form<TextFormValues>
+          defaultValues={{ value }}
+          onSubmit={({ value: nextValue }) => onSubmit(nextValue)}
+        >
+          <FormField<TextFormValues> name="value" label={title}>
+            <FormInput<TextFormValues>
+              name="value"
+              placeholder={placeholder}
+              disabled={pending}
+            />
+          </FormField>
+
+          <FormActions>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onCancel}
+              disabled={pending}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={pending}>
+              {pending ? "Saving..." : "Save"}
+            </Button>
+          </FormActions>
+        </Form>
+      ) : (
+        <p className={styles.textValue}>{value || "No value yet."}</p>
+      )}
+    </section>
+  );
+}
+
+function EditableSelectContextSection({
+  title,
+  value,
+  options,
+  isEditing,
+  canEdit,
+  pending,
+  onEdit,
+  onCancel,
+  onSubmit,
+}: {
+  title: string;
+  value: string;
+  options: Array<{ value: string; label: string }>;
+  isEditing: boolean;
+  canEdit: boolean;
+  pending: boolean;
+  onEdit: () => void;
+  onCancel: () => void;
+  onSubmit: (value: string) => void | Promise<void>;
+}) {
+  const currentLabel =
+    options.find((option) => option.value === value)?.label ?? value;
+
+  return (
+    <section className={styles.section}>
+      <div className={styles.sectionHeader}>
+        <h3 className={styles.sectionTitle}>{title}</h3>
+        {!isEditing ? (
+          <button
+            type="button"
+            className={styles.editButton}
+            onClick={onEdit}
+            disabled={!canEdit || pending}
+          >
+            <Pencil size={14} strokeWidth={2} />
+            Edit
+          </button>
+        ) : null}
+      </div>
+
+      {isEditing ? (
+        <Form<SelectFormValues>
+          defaultValues={{ value }}
+          onSubmit={({ value: nextValue }) => onSubmit(nextValue)}
+        >
+          <FormField<SelectFormValues> name="value" label={title}>
+            <FormSelect<SelectFormValues>
+              name="value"
+              options={options}
+              disabled={pending}
+            />
+          </FormField>
+
+          <FormActions>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onCancel}
+              disabled={pending}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={pending}>
+              {pending ? "Saving..." : "Save"}
+            </Button>
+          </FormActions>
+        </Form>
+      ) : (
+        <p className={styles.textValue}>{currentLabel || "No value yet."}</p>
+      )}
+    </section>
   );
 }
