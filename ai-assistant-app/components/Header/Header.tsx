@@ -24,7 +24,7 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Projects", icon: ClipboardList, href: "/dashboard/projects" }
+  { label: "Test Design", icon: ClipboardList, href: "/dashboard/projects" }
 ];
 
 export function Header() {

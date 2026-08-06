@@ -9,13 +9,13 @@ import { useRequirementGroups } from "@/features/requirementGroups/queries/requi
 import { CreateRequirement } from "@/features/requirements/components/CreateRequirement";
 import { RequirementList } from "@/features/requirements/components/RequirementList";
 import { useRequirements } from "@/features/requirements/queries/requirement.queries";
-import styles from "./requirements.module.scss";
+import styles from "./project.module.scss";
 
-type RequirementsPageContentProps = {
+type ProjectPageContentProps = {
   projectId: string;
 };
 
-function RequirementsPageContent({ projectId }: RequirementsPageContentProps) {
+function ProjectPageContent({ projectId }: ProjectPageContentProps) {
   const router = useRouter();
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const {
@@ -115,12 +115,12 @@ function RequirementsPageContent({ projectId }: RequirementsPageContentProps) {
   );
 }
 
-export default function RequirementsPage() {
+export default function ProjectPage() {
   const params = useParams();
   const projectId = typeof params.projectId === "string" ? params.projectId : null;
 
   if (!projectId) {
     return null;
   }
-  return <RequirementsPageContent projectId={projectId} />;
+  return <ProjectPageContent projectId={projectId} />;
 }

@@ -196,7 +196,7 @@ function RequirementGroupRow({
     <li className={styles.item}>
       <div className={styles.itemMain}>
         <Link
-          href={`/dashboard/projects/${projectId}/requirements`}
+          href={`/dashboard/projects/${projectId}`}
           className={styles.groupName}
         >
           {group.name}
