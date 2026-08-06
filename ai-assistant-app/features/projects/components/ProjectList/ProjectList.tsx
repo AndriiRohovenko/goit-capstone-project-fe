@@ -4,12 +4,14 @@ import Link from "next/link";
 import { FilePenLine, FolderPen, MoreHorizontal, Trash2 } from "lucide-react";
 import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 import { Button } from "@/components/Button";
+import { Modal } from "@/components/Modal";
 import { getApiErrorMessage } from "@/lib/api-error";
 import {
   useDeleteProject,
   useProjects,
 } from "@/features/projects/queries/projects.queries";
 import { formatRelativeTime } from "@/features/projects/utils/format-relative-time";
+import { UpdateProjectForm } from "@/features/projects/components/UpdateProjectForm";
 import type { Project, ProjectStatus } from "@/types/project";
 import styles from "./ProjectList.module.scss";
 
@@ -18,6 +20,7 @@ export function ProjectList() {
     useProjects();
   const deleteProject = useDeleteProject();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [detailsProjectId, setDetailsProjectId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
 
@@ -66,6 +69,15 @@ export function ProjectList() {
     setOpenMenuId((current) => (current === projectId ? null : projectId));
   }
 
+  function openDetailsModal(projectId: string) {
+    setOpenMenuId(null);
+    setDetailsProjectId(projectId);
+  }
+
+  function closeDetailsModal() {
+    setDetailsProjectId(null);
+  }
+
   return (
     <section className={styles.panel} aria-labelledby={titleId}>
       <span id={titleId} className={styles.srOnly}>
@@ -101,7 +113,7 @@ export function ProjectList() {
             <li key={project.id} className={styles.item}>
               <div className={styles.itemMain}>
                 <Link
-                  href={`/dashboard/projects/${project.id}/requirements`}
+                  href={`/dashboard/projects/${project.id}`}
                   className={styles.projectName}
                 >
                   {project.name}
@@ -140,15 +152,15 @@ export function ProjectList() {
 
                   {openMenuId === project.id ? (
                     <div className={styles.menu} role="menu">
-                      <Link
-                        href={`/dashboard/projects/${project.id}/overview`}
+                      <button
+                        type="button"
                         className={styles.menuItem}
                         role="menuitem"
-                        onClick={() => setOpenMenuId(null)}
+                        onClick={() => openDetailsModal(project.id)}
                       >
                         <FilePenLine size={16} strokeWidth={1.8} />
                         Update project details
-                      </Link>
+                      </button>
                       <Link
                         href={`/dashboard/projects/${project.id}/context`}
                         className={styles.menuItem}
@@ -177,6 +189,16 @@ export function ProjectList() {
           ))}
         </ul>
       )}
+
+      <Modal
+        open={Boolean(detailsProjectId)}
+        onClose={closeDetailsModal}
+        title="Update Project Details"
+      >
+        {detailsProjectId ? (
+          <UpdateProjectForm projectId={detailsProjectId} />
+        ) : null}
+      </Modal>
     </section>
   );
 }

@@ -1,0 +1,50 @@
+.nav {
+  width: 100%;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.link,
+.label,
+.current {
+  line-height: 1.4;
+}
+
+.link {
+  color: #667085;
+  text-decoration: none;
+
+  &:hover {
+    color: #25324b;
+    text-decoration: underline;
+  }
+}
+
+.label {
+  color: #667085;
+}
+
+.current {
+  color: #1d2433;
+  font-weight: 600;
+}
+
+.separator {
+  color: #b4b8c2;
+}
