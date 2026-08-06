@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/Button";
-import { RequirementGroupList } from "@/features/requirementGroups/components/groupList";
+import { RequirementGroupFilterList } from "@/features/requirementGroups/components/groupFilterList";
 import { useRequirementGroups } from "@/features/requirementGroups/queries/requirementGroups.queries";
 import { CreateRequirement } from "@/features/requirements/components/CreateRequirement";
 import { RequirementList } from "@/features/requirements/components/RequirementList";
@@ -27,6 +27,7 @@ function RequirementsPageContent({ projectId }: RequirementsPageContentProps) {
   } = useRequirements(projectId);
   const {
     data: requirementGroups,
+    isPending: groupsPending,
     isError: groupsError,
     refetch: refetchGroups,
   } = useRequirementGroups(projectId);
@@ -82,8 +83,9 @@ function RequirementsPageContent({ projectId }: RequirementsPageContentProps) {
         </div>
       </header>
 
-      <RequirementGroupList
-        projectId={projectId}
+      <RequirementGroupFilterList
+        groups={requirementGroups}
+        isLoading={groupsPending}
         selectedGroupId={selectedGroupId}
         totalCount={requirements?.length ?? 0}
         countsByGroupId={countsByGroupId}

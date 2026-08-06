@@ -39,14 +39,19 @@ export function useCreateRequirementGroup(projectId: string) {
   });
 }
 
-export function useUpdateRequirementGroup(projectId: string, groupId: string) {
+export function useUpdateRequirementGroup(projectId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: RequirementGroupPayload) =>
-      updateRequirementGroup(projectId, groupId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: requirementGroupKeys.detail(projectId, groupId) });
+    mutationFn: ({
+      groupId,
+      payload,
+    }: {
+      groupId: string;
+      payload: RequirementGroupPayload;
+    }) => updateRequirementGroup(projectId, groupId, payload),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: requirementGroupKeys.detail(projectId, variables.groupId) });
       queryClient.invalidateQueries({ queryKey: requirementGroupKeys.lists(projectId) });
     },
   });
