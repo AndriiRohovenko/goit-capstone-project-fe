@@ -16,6 +16,14 @@ export type Requirement = {
   updated_at: string;
 }
 
+export type PaginatedRequirements = {
+  items: Requirement[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
+
 
 export type RequirementPayload = {
   "title": string,

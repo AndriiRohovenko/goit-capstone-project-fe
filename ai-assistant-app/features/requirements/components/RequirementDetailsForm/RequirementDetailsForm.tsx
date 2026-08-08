@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import {
   Form,
-  FormActions,
   FormError,
   FormField,
   FormSelect,
@@ -64,6 +63,8 @@ export function RequirementDetailsForm({
   const [activeTab, setActiveTab] = useState<RequirementTab>("details");
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const submitRef = useRef<HTMLButtonElement>(null);
 
   const payloadBase = useMemo(() => toRequirementPayload(requirement), [requirement]);
 
@@ -111,6 +112,7 @@ export function RequirementDetailsForm({
 
     try {
       await updateRequirement.mutateAsync(nextPayload);
+      setIsEditing(false);
       setSuccessMessage("Details updated.");
     } catch (err) {
       setFormError(getApiErrorMessage(err, "Failed to update requirement."));
@@ -144,101 +146,143 @@ export function RequirementDetailsForm({
       </div>
 
       {activeTab === "details" ? (
-        <Form<RequirementDetailsFormValues>
-          key={requirement.updated_at}
-          defaultValues={defaultValues}
-          onSubmit={handleSubmit}
-        >
+        <>
           <section className={styles.section}>
-            <FormField<RequirementDetailsFormValues> name="group_id" label="Group">
-              <FormSelect<RequirementDetailsFormValues>
-                name="group_id"
-                options={groupOptions}
-                disabled={updateRequirement.isPending}
-              />
-            </FormField>
+            <div className={styles.sectionHeader}>
+              <h3 className={styles.sectionTitle}>Requirement Details</h3>
+              {isEditing ? (
+                <Button
+                  type="button"
+                  onClick={() => submitRef.current?.click()}
+                  disabled={updateRequirement.isPending}
+                >
+                  {updateRequirement.isPending ? "Saving..." : "Save Requirement"}
+                </Button>
+              ) : (
+                <Button type="button" onClick={() => setIsEditing(true)}>
+                  Edit Requirement
+                </Button>
+              )}
+            </div>
+          </section>
 
-            <FormField<RequirementDetailsFormValues>
-              name="requirement_type"
-              label="Requirement Type"
-            >
-              <FormSelect<RequirementDetailsFormValues>
+          <Form<RequirementDetailsFormValues>
+            key={requirement.updated_at}
+            defaultValues={defaultValues}
+            onSubmit={handleSubmit}
+          >
+            {/* hidden submit button triggered by the external Save button */}
+            <button ref={submitRef} type="submit" style={{ display: "none" }} aria-hidden="true" />
+
+            <section className={styles.section}>
+              <div className={styles.formGrid}>
+              <FormField<RequirementDetailsFormValues> name="group_id" label="Group">
+                <FormSelect<RequirementDetailsFormValues>
+                  name="group_id"
+                  options={groupOptions}
+                  disabled={updateRequirement.isPending || !isEditing}
+                />
+              </FormField>
+
+              <FormField<RequirementDetailsFormValues>
                 name="requirement_type"
-                options={ensureOption(requirementTypeOptions, defaultValues.requirement_type)}
-                disabled={updateRequirement.isPending}
-              />
-            </FormField>
+                label="Requirement Type"
+              >
+                <FormSelect<RequirementDetailsFormValues>
+                  name="requirement_type"
+                  options={ensureOption(requirementTypeOptions, defaultValues.requirement_type)}
+                  disabled={updateRequirement.isPending || !isEditing}
+                />
+              </FormField>
 
-            <FormField<RequirementDetailsFormValues> name="priority" label="Priority">
-              <FormSelect<RequirementDetailsFormValues>
-                name="priority"
-                options={ensureOption(priorityOptions, defaultValues.priority)}
-                disabled={updateRequirement.isPending}
-              />
-            </FormField>
+              <FormField<RequirementDetailsFormValues> name="priority" label="Priority">
+                <FormSelect<RequirementDetailsFormValues>
+                  name="priority"
+                  options={ensureOption(priorityOptions, defaultValues.priority)}
+                  disabled={updateRequirement.isPending || !isEditing}
+                />
+              </FormField>
 
-            <FormField<RequirementDetailsFormValues> name="status" label="Status">
-              <FormSelect<RequirementDetailsFormValues>
-                name="status"
-                options={ensureOption(statusOptions, defaultValues.status)}
-                disabled={updateRequirement.isPending}
-              />
-            </FormField>
+              <FormField<RequirementDetailsFormValues> name="status" label="Status">
+                <FormSelect<RequirementDetailsFormValues>
+                  name="status"
+                  options={ensureOption(statusOptions, defaultValues.status)}
+                  disabled={updateRequirement.isPending || !isEditing}
+                />
+              </FormField>
+            </div>
           </section>
 
           <section className={styles.section}>
-            <FormField<RequirementDetailsFormValues>
-              name="description"
-              label="Description"
-            >
-              <FormTextarea<RequirementDetailsFormValues>
-                name="description"
-                rows={4}
-                placeholder="Describe the requirement"
-                disabled={updateRequirement.isPending}
-              />
-            </FormField>
+            <h3 className={styles.sectionTitle}>Description</h3>
+            {isEditing ? (
+              <div className={styles.fieldset}>
+                <FormTextarea<RequirementDetailsFormValues>
+                  name="description"
+                  rows={4}
+                  placeholder="Describe the requirement"
+                  disabled={updateRequirement.isPending}
+                />
+              </div>
+            ) : (
+              <p className={styles.paragraph}>
+                {requirement.description || <em>No description provided.</em>}
+              </p>
+            )}
           </section>
 
           <section className={styles.section}>
-            <FormField<RequirementDetailsFormValues>
-              name="acceptance_criteria"
-              label="Acceptance Criteria"
-            >
-              <FormTextarea<RequirementDetailsFormValues>
-                name="acceptance_criteria"
-                rows={5}
-                placeholder="One criterion per line"
-                disabled={updateRequirement.isPending}
-              />
-            </FormField>
+            <h3 className={styles.sectionTitle}>Acceptance Criteria</h3>
+            {isEditing ? (
+              <div className={styles.fieldset}>
+                <FormTextarea<RequirementDetailsFormValues>
+                  name="acceptance_criteria"
+                  rows={5}
+                  placeholder="One criterion per line"
+                  disabled={updateRequirement.isPending}
+                />
+              </div>
+            ) : (
+              <ul className={styles.list}>
+                {requirement.acceptance_criteria?.length ? (
+                  requirement.acceptance_criteria.map((item, i) => (
+                    <li key={i} className={styles.listItem}>{item}</li>
+                  ))
+                ) : (
+                  <li className={styles.listItem}><em>No criteria defined.</em></li>
+                )}
+              </ul>
+            )}
           </section>
 
           <section className={styles.section}>
-            <FormField<RequirementDetailsFormValues>
-              name="business_rules"
-              label="Business Rules"
-            >
-              <FormTextarea<RequirementDetailsFormValues>
-                name="business_rules"
-                rows={5}
-                placeholder="One rule per line"
-                disabled={updateRequirement.isPending}
-              />
-            </FormField>
-          </section>
-
-          <section className={styles.section}>
-            <FormActions>
-              <Button type="submit" disabled={updateRequirement.isPending}>
-                {updateRequirement.isPending ? "Saving..." : "Update details"}
-              </Button>
-            </FormActions>
+            <h3 className={styles.sectionTitle}>Business Rules</h3>
+            {isEditing ? (
+              <div className={styles.fieldset}>
+                <FormTextarea<RequirementDetailsFormValues>
+                  name="business_rules"
+                  rows={5}
+                  placeholder="One rule per line"
+                  disabled={updateRequirement.isPending}
+                />
+              </div>
+            ) : (
+              <ul className={styles.list}>
+                {requirement.business_rules?.length ? (
+                  requirement.business_rules.map((item, i) => (
+                    <li key={i} className={styles.listItem}>{item}</li>
+                  ))
+                ) : (
+                  <li className={styles.listItem}><em>No rules defined.</em></li>
+                )}
+              </ul>
+            )}
           </section>
 
           <FormError message={formError} />
           {successMessage ? <p className={styles.success}>{successMessage}</p> : null}
         </Form>
+        </>
       ) : (
         <section className={styles.section}>
           <p className={styles.mockedMessage}>

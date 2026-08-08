@@ -24,7 +24,7 @@ export function RequirementHeader({
       </Link>
 
       <div className={styles.headerRow}>
-        <span className={styles.idBadge}>{formatRequirementId(requirement.id)}</span>
+       
         <div className={styles.copy}>
           <h1 className={styles.title}>{requirement.title}</h1>
           <p className={styles.subtitle}>

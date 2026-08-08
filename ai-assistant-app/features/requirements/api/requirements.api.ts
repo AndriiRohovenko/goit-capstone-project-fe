@@ -1,9 +1,23 @@
 import { apiClient } from "@/lib/api-client";
-import type {Requirement, RequirementPayload} from "@/types/requirement";
+import type { PaginatedRequirements, Requirement, RequirementPayload } from "@/types/requirement";
 
-export async function getRequirements(projectId: string, groupId?: string): Promise<Requirement[]> {
-  const query = groupId ? `?group_id=${groupId}` : "";
-  const response = await apiClient.get(`/projects/${projectId}/requirements${query}`);
+type GetRequirementsParams = {
+  groupId?: string;
+  page?: number;
+  limit?: number;
+};
+
+export async function getRequirements(
+  projectId: string,
+  params?: GetRequirementsParams,
+): Promise<PaginatedRequirements> {
+  const searchParams = new URLSearchParams();
+  if (params?.groupId) searchParams.set("group_id", params.groupId);
+  searchParams.set("page", String(params?.page ?? 1));
+  searchParams.set("limit", String(params?.limit ?? 20));
+  const response = await apiClient.get(
+    `/projects/${projectId}/requirements?${searchParams.toString()}`,
+  );
   return response.data;
 }
 

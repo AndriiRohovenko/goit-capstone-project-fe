@@ -11,10 +11,16 @@ import {
 import { requirementKeys } from "@/features/requirements/queries/requirement.keys";
 import type { RequirementPayload } from "@/types/requirement";
 
-export function useRequirements(projectId: string, groupId?: string) {
+type UseRequirementsParams = {
+  groupId?: string;
+  page?: number;
+  limit?: number;
+};
+
+export function useRequirements(projectId: string, params?: UseRequirementsParams) {
   return useQuery({
-    queryKey: requirementKeys.lists(projectId),
-    queryFn: () => getRequirements(projectId, groupId),
+    queryKey: requirementKeys.lists(projectId, params),
+    queryFn: () => getRequirements(projectId, params),
   });
 }
 

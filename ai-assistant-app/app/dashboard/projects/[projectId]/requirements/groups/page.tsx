@@ -16,17 +16,17 @@ function RequirementGroupsPageContent({ projectId }: { projectId: string }) {
     error: groupsErrorValue,
     refetch: refetchGroups,
   } = useRequirementGroups(projectId);
-  const { data: requirements } = useRequirements(projectId);
+  const { data: requirementsData } = useRequirements(projectId);
 
   const countsByGroupId = useMemo(() => {
     const counts: Record<string, number> = {};
 
-    for (const requirement of requirements ?? []) {
+    for (const requirement of requirementsData?.items ?? []) {
       counts[requirement.group_id] = (counts[requirement.group_id] ?? 0) + 1;
     }
 
     return counts;
-  }, [requirements]);
+  }, [requirementsData]);
 
   return (
     <div className={styles.page}>

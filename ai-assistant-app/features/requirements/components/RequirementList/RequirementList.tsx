@@ -19,6 +19,10 @@ type RequirementListProps = {
   error: unknown;
   selectedGroupId: string | null;
   onRetry: () => void;
+  page: number;
+  totalPages: number;
+  total: number;
+  onPageChange: (page: number) => void;
 };
 
 export function RequirementList({
@@ -30,6 +34,10 @@ export function RequirementList({
   error,
   selectedGroupId,
   onRetry,
+  page,
+  totalPages,
+  total,
+  onPageChange,
 }: RequirementListProps) {
   const titleId = useId();
   const [openRequirementId, setOpenRequirementId] = useState<string | null>(null);
@@ -99,6 +107,32 @@ export function RequirementList({
           ))}
         </ul>
       )}
+
+      {!isLoading && !isError && totalPages > 1 ? (
+        <div className={styles.pagination}>
+          <span className={styles.paginationInfo}>
+            Page {page} of {totalPages} &middot; {total} requirement{total !== 1 ? "s" : ""}
+          </span>
+          <div className={styles.paginationControls}>
+            <button
+              type="button"
+              className={styles.pageButton}
+              onClick={() => onPageChange(page - 1)}
+              disabled={page <= 1}
+            >
+              &larr; Prev
+            </button>
+            <button
+              type="button"
+              className={styles.pageButton}
+              onClick={() => onPageChange(page + 1)}
+              disabled={page >= totalPages}
+            >
+              Next &rarr;
+            </button>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
