@@ -4,6 +4,17 @@
   gap: 1rem;
 }
 
+.contentGrid {
+  display: grid;
+  grid-template-columns: 22rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+
+  @media (max-width: 1080px) {
+    grid-template-columns: 1fr;
+  }
+}
+
 .status,
 .error {
   margin: 0;
