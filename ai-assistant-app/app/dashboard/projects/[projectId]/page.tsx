@@ -18,13 +18,16 @@ type ProjectPageContentProps = {
 function ProjectPageContent({ projectId }: ProjectPageContentProps) {
   const router = useRouter();
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const LIMIT = 7;
+
   const {
-    data: requirements,
+    data: requirementsData,
     isPending: requirementsPending,
     isError: requirementsError,
     error: requirementsErrorValue,
     refetch: refetchRequirements,
-  } = useRequirements(projectId);
+  } = useRequirements(projectId, { groupId: selectedGroupId ?? undefined, page, limit: LIMIT });
   const {
     data: requirementGroups,
     isPending: groupsPending,
@@ -35,22 +38,17 @@ function ProjectPageContent({ projectId }: ProjectPageContentProps) {
   const countsByGroupId = useMemo(() => {
     const counts: Record<string, number> = {};
 
-    for (const requirement of requirements ?? []) {
+    for (const requirement of requirementsData?.items ?? []) {
       counts[requirement.group_id] = (counts[requirement.group_id] ?? 0) + 1;
     }
 
     return counts;
-  }, [requirements]);
+  }, [requirementsData]);
 
-  const filteredRequirements = useMemo(() => {
-    if (!selectedGroupId) {
-      return requirements ?? [];
-    }
-
-    return (requirements ?? []).filter(
-      (requirement) => requirement.group_id === selectedGroupId,
-    );
-  }, [requirements, selectedGroupId]);
+  function handleSelectGroup(groupId: string | null) {
+    setSelectedGroupId(groupId);
+    setPage(1);
+  }
 
   const groupNameById = useMemo(
     () => new Map((requirementGroups ?? []).map((group) => [group.id, group.name])),
@@ -87,20 +85,24 @@ function ProjectPageContent({ projectId }: ProjectPageContentProps) {
         groups={requirementGroups}
         isLoading={groupsPending}
         selectedGroupId={selectedGroupId}
-        totalCount={requirements?.length ?? 0}
+        totalCount={requirementsData?.total ?? 0}
         countsByGroupId={countsByGroupId}
-        onSelectGroup={setSelectedGroupId}
+        onSelectGroup={handleSelectGroup}
       />
 
       <RequirementList
         projectId={projectId}
-        requirements={filteredRequirements}
+        requirements={requirementsData?.items ?? []}
         groupNameById={groupNameById}
         isLoading={requirementsPending}
         isError={requirementsError}
         error={requirementsErrorValue}
         onRetry={() => void refetchRequirements()}
         selectedGroupId={selectedGroupId}
+        page={page}
+        totalPages={requirementsData?.pages ?? 1}
+        total={requirementsData?.total ?? 0}
+        onPageChange={setPage}
       />
 
       {groupsError ? (

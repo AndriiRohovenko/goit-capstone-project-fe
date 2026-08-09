@@ -52,7 +52,7 @@ export async function updateProjectContext(
   projectId: string,
   payload: UpdateProjectContextPayload,
 ): Promise<ProjectContext> {
-  const { data } = await apiClient.put<ProjectContext>(
+  const { data } = await apiClient.patch<ProjectContext>(
     `/projects/${projectId}/context`,
     payload,
   );
