@@ -18,6 +18,7 @@ import styles from "./ProjectList.module.scss";
 export function ProjectList() {
   const { data, isPending, isError, error, refetch, isFetching } =
     useProjects();
+    
   const deleteProject = useDeleteProject();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [detailsProjectId, setDetailsProjectId] = useState<string | null>(null);
