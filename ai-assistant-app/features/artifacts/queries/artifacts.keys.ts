@@ -1,3 +1,5 @@
+import type { ArtifactType } from "@/types/artifacts";
+
 export const artifactsKeys = {
   all: ["artifacts"] as const,
   lists: (projectId?: string, requirementId?: string) =>
@@ -7,7 +9,11 @@ export const artifactsKeys = {
       ...(projectId ? [projectId] : []),
       ...(requirementId ? [requirementId] : []),
     ] as const,
-  detail: (projectId: string, requirementId: string, artifactType: string) =>
+  detail: (
+    projectId: string,
+    requirementId: string,
+    artifactType: ArtifactType,
+  ) =>
     [
       ...artifactsKeys.all,
       "detail",

@@ -151,7 +151,7 @@ export function RequirementReviewForm({
               {isGenerating
                 ? "Generating..."
                 : hasReview
-                  ? "Regenerate requirement"
+                  ? "Regenerate review"
                   : "Generate review"}
             </Button>
             <Button
@@ -243,11 +243,13 @@ function ReviewListBlock({
 }
 
 function parseReview(artifact?: Artifact): ReviewData | null {
-  if (!artifact?.content) {
+  const content = toObject(artifact?.content);
+
+  if (!content) {
     return null;
   }
 
-  const summary = readString(artifact.content.summary);
+  const summary = readString(content.summary);
 
   if (!summary) {
     return null;
@@ -255,11 +257,19 @@ function parseReview(artifact?: Artifact): ReviewData | null {
 
   return {
     summary,
-    ambiguities: readStringArray(artifact.content.ambiguities),
-    suggestions: readStringArray(artifact.content.suggestions),
-    qualityIssues: readStringArray(artifact.content.quality_issues),
-    missingDetails: readStringArray(artifact.content.missing_details),
+    ambiguities: readStringArray(content.ambiguities),
+    suggestions: readStringArray(content.suggestions),
+    qualityIssues: readStringArray(content.quality_issues),
+    missingDetails: readStringArray(content.missing_details),
   };
+}
+
+function toObject(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+
+  return value as Record<string, unknown>;
 }
 
 function readString(value: unknown): string {
