@@ -17,21 +17,21 @@ Create `ai-assistant-app/.env.local`:
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 
-The frontend talks to FastAPI through a shared axios client (`withCredentials: true`) so HttpOnly auth cookies are sent automatically.
+The frontend talks to FastAPI through a shared axios client without credentialed requests. Auth is handled with bearer tokens returned by the API and stored locally.
 
-### Backend CORS (required for cookie auth)
+### Backend CORS
 
-FastAPI must allow credentials and an **explicit** frontend origin (not `*`):
+Since cookies are not used, FastAPI does not need credentialed CORS. Use an explicit frontend origin instead of `*`:
 
 - `allow_origins=["http://localhost:3000"]` (or your deployed origin)
-- `allow_credentials=True`
-- Login / register / refresh should set HttpOnly cookies for access + refresh tokens
-- `SameSite` appropriately for your deploy setup; use `Secure` in production
+- `allow_credentials=False`
+- Login / register / refresh should return access + refresh tokens in JSON
+- Protected requests should use the `Authorization: Bearer ...` header
 
 ## Architecture (brief)
 
 - **TanStack Query** — server/API state only (projects, etc.): fetch, cache, loading, mutations, invalidation
-- **Auth layer** — `lib/api-client.ts` + `features/auth`: cookie credentials, 401 → refresh → retry; AuthProvider holds `user` / `isAuthenticated` only (never JWTs)
+- **Auth layer** — `lib/api-client.ts` + `features/auth`: bearer-token auth, 401 → refresh → retry; AuthProvider holds `user` / `isAuthenticated` only (never JWTs)
 - **No Redux** for server state or tokens
 
 ## Scripts

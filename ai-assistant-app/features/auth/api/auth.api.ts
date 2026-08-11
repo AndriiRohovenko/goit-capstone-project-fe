@@ -54,7 +54,6 @@ export async function verifyEmail(token: string): Promise<AuthUser> {
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-email`,
     {
       params: { token },
-      withCredentials: true,
     },
   );
 
