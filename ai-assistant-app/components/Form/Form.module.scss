@@ -46,7 +46,8 @@
 
 .select {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, #6b7280 50%),
+  background-image:
+    linear-gradient(45deg, transparent 50%, #6b7280 50%),
     linear-gradient(135deg, #6b7280 50%, transparent 50%);
   background-position:
     calc(100% - 16px) calc(50% - 3px),
@@ -70,4 +71,45 @@
   justify-content: flex-end;
   gap: 0.5rem;
   margin-top: 0.25rem;
+}
+
+.infoBlock {
+  border: 1px solid #edf0f6;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.85rem;
+}
+
+.infoBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.infoBlockTitle {
+  margin: 0;
+  color: #101828;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.infoList {
+  margin: 0.65rem 0 0;
+  padding-left: 1.1rem;
+  color: #475467;
+}
+
+.infoList li {
+  line-height: 1.6;
+}
+
+.infoList li + li {
+  margin-top: 0.3rem;
+}
+
+.infoEmpty {
+  margin: 0;
+  color: #667085;
+  line-height: 1.6;
 }

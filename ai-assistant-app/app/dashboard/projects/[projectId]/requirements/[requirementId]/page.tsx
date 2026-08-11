@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/Button";
-import { RequirementReviewForm } from "@/features/artifacts/components/requirementReviewForm/requirementReviewForm";
-import { TestArtifactsForm } from "@/features/artifacts/components/testArtifactsForm/testArtifactsForm";
+import { AiFeaturesSidebar } from "@/features/artifacts/components/aiFeaturesSidebar/aiFeaturesSidebar";
 import { RequirementHeader } from "@/features/requirements/components/RequirementHeader";
 import {
   RequirementDetailsForm,
@@ -69,12 +68,7 @@ function RequirementPageContent({
 
       <div className={styles.contentGrid}>
         <div className={styles.analysisColumn}>
-          <RequirementReviewForm
-            projectId={projectId}
-            requirementId={requirement.id}
-          />
-
-          <TestArtifactsForm
+          <AiFeaturesSidebar
             projectId={projectId}
             requirementId={requirement.id}
             onShowArtifacts={() => setActiveTab("artifacts")}

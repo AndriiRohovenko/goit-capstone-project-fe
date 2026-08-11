@@ -9,9 +9,9 @@ import {
 } from "@/features/artifacts/queries/artifacts.queries";
 import { getApiErrorMessage } from "@/lib/api-error";
 import type { Artifact, TestArtifactType } from "@/types/artifacts";
-import styles from "./testArtifactsForm.module.scss";
+import styles from "./requirementArtifactsSection.module.scss";
 
-type TestArtifactsFormProps = {
+type RequirementArtifactsSectionProps = {
   projectId: string;
   requirementId: string;
   onShowArtifacts: () => void;
@@ -23,11 +23,11 @@ const TEST_ARTIFACT_TYPES: TestArtifactType[] = [
   "negative_scenarios",
 ];
 
-export function TestArtifactsForm({
+export function RequirementArtifactsSection({
   projectId,
   requirementId,
   onShowArtifacts,
-}: TestArtifactsFormProps) {
+}: RequirementArtifactsSectionProps) {
   const [actionError, setActionError] = useState<string | null>(null);
   const artifacts = useArtifacts(projectId, requirementId);
   const createArtifact = useCreateArtifact();
@@ -54,6 +54,7 @@ export function TestArtifactsForm({
   }, [existingTestArtifacts]);
 
   async function handleGenerateOrRegenerate() {
+    onShowArtifacts();
     setActionError(null);
 
     try {
@@ -70,46 +71,44 @@ export function TestArtifactsForm({
   }
 
   return (
-    <section className={styles.panel}>
-      <div className={styles.card}>
-        <h4 className={styles.cardTitle}>Test Artifacts Generation</h4>
-        <p className={styles.description}>
-          Generate comprehensive test artifacts including test cases,
-          checklists, and negative scenarios.
-        </p>
+    <section className={styles.card}>
+      <h4 className={styles.cardTitle}>Test Artifacts Generation</h4>
+      <p className={styles.description}>
+        Generate comprehensive test artifacts including test cases, checklists,
+        and negative scenarios.
+      </p>
 
-        <Button
-          type="button"
-          className={styles.actionButton}
-          onClick={() => void handleGenerateOrRegenerate()}
-          disabled={artifacts.isPending || isGenerating}
-        >
-          <Sparkles size={16} strokeWidth={2.1} />
-          {isGenerating
-            ? "Generating..."
-            : hasGenerated
-              ? "Regenerate Artifacts"
-              : "Generate Artifacts"}
-        </Button>
+      <Button
+        type="button"
+        className={styles.actionButton}
+        onClick={() => void handleGenerateOrRegenerate()}
+        disabled={artifacts.isPending || isGenerating}
+      >
+        <Sparkles size={16} strokeWidth={2.1} />
+        {isGenerating
+          ? "Generating..."
+          : hasGenerated
+            ? "Regenerate Artifacts"
+            : "Generate Artifacts"}
+      </Button>
 
-        <Button
-          type="button"
-          variant="secondary"
-          className={styles.secondaryButton}
-          onClick={onShowArtifacts}
-          disabled={artifacts.isPending}
-        >
-          Show all artifacts
-        </Button>
+      <Button
+        type="button"
+        variant="secondary"
+        className={styles.secondaryButton}
+        onClick={onShowArtifacts}
+        disabled={artifacts.isPending}
+      >
+        Show all artifacts
+      </Button>
 
-        {actionError ? <p className={styles.error}>{actionError}</p> : null}
+      {actionError ? <p className={styles.error}>{actionError}</p> : null}
 
-        <p className={styles.meta}>
-          {latestGeneratedAt
-            ? `Last generated: ${formatDate(latestGeneratedAt)}`
-            : "No test artifacts generated yet."}
-        </p>
-      </div>
+      <p className={styles.meta}>
+        {latestGeneratedAt
+          ? `Last generated: ${formatDate(latestGeneratedAt)}`
+          : "No test artifacts generated yet."}
+      </p>
     </section>
   );
 }

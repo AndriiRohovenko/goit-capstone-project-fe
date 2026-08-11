@@ -11,6 +11,10 @@
   gap: 0.75rem;
 }
 
+.headerActionButton {
+  flex-shrink: 0;
+}
+
 .title {
   margin: 0;
   color: #1f2937;
@@ -22,6 +26,55 @@
   margin: 0;
   color: #667085;
   line-height: 1.55;
+}
+
+.contentRegion {
+  position: relative;
+}
+
+.contentRegionBusy {
+  pointer-events: none;
+}
+
+.contentRegionBusy .list,
+.contentRegionBusy .empty {
+  filter: blur(2.5px);
+  opacity: 0.55;
+  transition:
+    filter 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  background: rgb(255 255 255 / 32%);
+  border-radius: 12px;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  border: 2px solid #d6ddf2;
+  border-top-color: #5b4ddd;
+  animation: spin-loader 0.85s linear infinite;
+}
+
+.overlayText {
+  color: #344054;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+@keyframes spin-loader {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .list {

@@ -16,6 +16,11 @@ import type {
   UpdateArtifactRequest,
 } from "@/types/artifacts";
 
+export const ARTIFACT_GENERATE_MUTATION_KEY = [
+  "artifacts",
+  "generate",
+] as const;
+
 export function useArtifacts(projectId: string, requirementId: string) {
   return useQuery<Artifact[]>({
     queryKey: artifactsKeys.lists(projectId, requirementId),
@@ -49,6 +54,7 @@ export function useCreateArtifact() {
       payload: CreateArtifactRequest;
     }
   >({
+    mutationKey: ARTIFACT_GENERATE_MUTATION_KEY,
     mutationFn: ({ projectId, requirementId, payload }) =>
       createArtifactsByGenerationType(projectId, requirementId, payload),
     onSuccess: (_data, { projectId, requirementId }) => {
