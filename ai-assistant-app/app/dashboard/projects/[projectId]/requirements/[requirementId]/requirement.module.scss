@@ -15,6 +15,12 @@
   }
 }
 
+.analysisColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .status,
 .error {
   margin: 0;

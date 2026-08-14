@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  createArtifactByType,
+  createArtifactsByGenerationType,
   getAllArtifacts,
   getArtifactByType,
   regenerateArtifactByType,
@@ -11,9 +11,15 @@ import {
 import { artifactsKeys } from "@/features/artifacts/queries/artifacts.keys";
 import type {
   Artifact,
+  ArtifactType,
   CreateArtifactRequest,
   UpdateArtifactRequest,
 } from "@/types/artifacts";
+
+export const ARTIFACT_GENERATE_MUTATION_KEY = [
+  "artifacts",
+  "generate",
+] as const;
 
 export function useArtifacts(projectId: string, requirementId: string) {
   return useQuery<Artifact[]>({
@@ -26,7 +32,7 @@ export function useArtifacts(projectId: string, requirementId: string) {
 export function useArtifact(
   projectId: string,
   requirementId: string,
-  artifactType: string,
+  artifactType: ArtifactType,
 ) {
   return useQuery<Artifact>({
     queryKey: artifactsKeys.detail(projectId, requirementId, artifactType),
@@ -48,8 +54,9 @@ export function useCreateArtifact() {
       payload: CreateArtifactRequest;
     }
   >({
+    mutationKey: ARTIFACT_GENERATE_MUTATION_KEY,
     mutationFn: ({ projectId, requirementId, payload }) =>
-      createArtifactByType(projectId, requirementId, payload),
+      createArtifactsByGenerationType(projectId, requirementId, payload),
     onSuccess: (_data, { projectId, requirementId }) => {
       void queryClient.invalidateQueries({
         queryKey: artifactsKeys.lists(projectId, requirementId),
@@ -68,7 +75,7 @@ export function useUpdateArtifact() {
     {
       projectId: string;
       requirementId: string;
-      artifactType: string;
+      artifactType: ArtifactType;
       payload: UpdateArtifactRequest;
     }
   >({
@@ -94,7 +101,7 @@ export function useRegenerateArtifact() {
     {
       projectId: string;
       requirementId: string;
-      artifactType: string;
+      artifactType: ArtifactType;
     }
   >({
     mutationFn: ({ projectId, requirementId, artifactType }) =>

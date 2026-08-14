@@ -1,10 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/Button";
-import { RequirementReviewForm } from "@/features/artifacts/components/requirementReviewForm/requirementReviewForm";
+import { AiFeaturesSidebar } from "@/features/artifacts/components/aiFeaturesSidebar/aiFeaturesSidebar";
 import { RequirementHeader } from "@/features/requirements/components/RequirementHeader";
-import { RequirementDetailsForm } from "@/features/requirements/components/RequirementDetailsForm";
+import {
+  RequirementDetailsForm,
+  type RequirementTab,
+} from "@/features/requirements/components/RequirementDetailsForm";
 import { useRequirement } from "@/features/requirements/queries/requirement.queries";
 import { useRequirementGroups } from "@/features/requirementGroups/queries/requirementGroups.queries";
 import styles from "./requirement.module.scss";
@@ -18,6 +22,7 @@ function RequirementPageContent({
   projectId,
   requirementId,
 }: RequirementPageContentProps) {
+  const [activeTab, setActiveTab] = useState<RequirementTab>("details");
   const {
     data: requirement,
     isPending,
@@ -62,15 +67,20 @@ function RequirementPageContent({
       />
 
       <div className={styles.contentGrid}>
-        <RequirementReviewForm
-          projectId={projectId}
-          requirementId={requirement.id}
-        />
+        <div className={styles.analysisColumn}>
+          <AiFeaturesSidebar
+            projectId={projectId}
+            requirementId={requirement.id}
+            onShowArtifacts={() => setActiveTab("artifacts")}
+          />
+        </div>
 
         <RequirementDetailsForm
           projectId={projectId}
           requirement={requirement}
           groups={groups}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
         />
       </div>
     </div>

@@ -5,3 +5,5 @@ export { FormTextarea } from "./FormTextarea";
 export { FormSelect } from "./FormSelect";
 export { FormError } from "./FormError";
 export { FormActions } from "./FormActions";
+export { FormInfoListBlock } from "./FormInfoListBlock";
+export { FormList } from "./FormList";

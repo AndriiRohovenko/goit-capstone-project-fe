@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Sparkles } from "lucide-react";
 import { Button } from "@/components/Button";
+import { FormActions, FormError, FormInfoListBlock } from "@/components/Form";
 import { Modal } from "@/components/Modal";
 import {
   useArtifacts,
@@ -11,11 +11,13 @@ import {
 } from "@/features/artifacts/queries/artifacts.queries";
 import { getApiErrorMessage } from "@/lib/api-error";
 import type { Artifact } from "@/types/artifacts";
-import styles from "./requirementReviewForm.module.scss";
+import styles from "./requirementReviewModal.module.scss";
 
-type RequirementReviewFormProps = {
+type RequirementReviewModalProps = {
   projectId: string;
   requirementId: string;
+  isOpen: boolean;
+  onClose: () => void;
 };
 
 type ReviewData = {
@@ -28,11 +30,12 @@ type ReviewData = {
 
 const REVIEW_ARTIFACT_TYPE = "requirement_review";
 
-export function RequirementReviewForm({
+export function RequirementReviewModal({
   projectId,
   requirementId,
-}: RequirementReviewFormProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  isOpen,
+  onClose,
+}: RequirementReviewModalProps) {
   const [actionError, setActionError] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -57,9 +60,9 @@ export function RequirementReviewForm({
       return;
     }
 
-    setIsOpen(false);
     setActionError(null);
     setCopiedKey(null);
+    onClose();
   }
 
   async function handleGenerateOrRegenerate() {
@@ -103,33 +106,6 @@ export function RequirementReviewForm({
 
   return (
     <>
-      <section className={styles.panel}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>AI Requirement Analysis</h3>
-        </div>
-
-        <div className={styles.card}>
-          <h4 className={styles.cardTitle}>AI Requirement Review</h4>
-          <p className={styles.description}>
-            Review this requirement for clarity, testability, completeness and
-            potential issues.
-          </p>
-
-          <Button
-            type="button"
-            className={styles.actionButton}
-            onClick={() => {
-              setActionError(null);
-              setIsOpen(true);
-            }}
-            disabled={artifacts.isPending}
-          >
-            <Sparkles size={16} strokeWidth={2.1} />
-            AI Review Requirement
-          </Button>
-        </div>
-      </section>
-
       <Modal
         open={isOpen}
         onClose={handleClose}
@@ -142,7 +118,7 @@ export function RequirementReviewForm({
             content.
           </p>
 
-          <div className={styles.modalActions}>
+          <FormActions>
             <Button
               type="button"
               onClick={() => void handleGenerateOrRegenerate()}
@@ -151,7 +127,7 @@ export function RequirementReviewForm({
               {isGenerating
                 ? "Generating..."
                 : hasReview
-                  ? "Regenerate requirement"
+                  ? "Regenerate review"
                   : "Generate review"}
             </Button>
             <Button
@@ -162,9 +138,9 @@ export function RequirementReviewForm({
             >
               Close
             </Button>
-          </div>
+          </FormActions>
 
-          {actionError ? <p className={styles.error}>{actionError}</p> : null}
+          <FormError message={actionError} />
 
           {artifacts.isPending ? (
             <p className={styles.empty}>Loading review...</p>
@@ -175,25 +151,46 @@ export function RequirementReviewForm({
                 <p className={styles.summary}>{review.summary}</p>
               </section>
 
-              <ReviewListBlock title="Ambiguities" items={review.ambiguities} />
-
-              <ReviewListBlock
-                title="Suggestions"
-                items={review.suggestions}
-                onCopy={() => void copyItems("suggestions", review.suggestions)}
-                isCopied={copiedKey === "suggestions"}
+              <FormInfoListBlock
+                title="Ambiguities"
+                items={review.ambiguities}
               />
 
-              <ReviewListBlock
+              <FormInfoListBlock
+                title="Suggestions"
+                items={review.suggestions}
+                action={
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() =>
+                      void copyItems("suggestions", review.suggestions)
+                    }
+                  >
+                    {copiedKey === "suggestions" ? "Copied" : "Copy"}
+                  </Button>
+                }
+              />
+
+              <FormInfoListBlock
                 title="Quality Issues"
                 items={review.qualityIssues}
               />
 
-              <ReviewListBlock
+              <FormInfoListBlock
                 title="Missing Details"
                 items={review.missingDetails}
-                onCopy={() => void copyItems("missing", review.missingDetails)}
-                isCopied={copiedKey === "missing"}
+                action={
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() =>
+                      void copyItems("missing", review.missingDetails)
+                    }
+                  >
+                    {copiedKey === "missing" ? "Copied" : "Copy"}
+                  </Button>
+                }
               />
             </div>
           ) : (
@@ -207,47 +204,14 @@ export function RequirementReviewForm({
   );
 }
 
-function ReviewListBlock({
-  title,
-  items,
-  onCopy,
-  isCopied = false,
-}: {
-  title: string;
-  items: string[];
-  onCopy?: () => void;
-  isCopied?: boolean;
-}) {
-  return (
-    <section className={styles.block}>
-      <div className={styles.blockHeader}>
-        <h4 className={styles.blockTitle}>{title}</h4>
-        {onCopy ? (
-          <Button type="button" variant="secondary" onClick={onCopy}>
-            {isCopied ? "Copied" : "Copy"}
-          </Button>
-        ) : null}
-      </div>
-
-      {items.length ? (
-        <ul className={styles.list}>
-          {items.map((item, index) => (
-            <li key={`${title}-${index}`}>{item}</li>
-          ))}
-        </ul>
-      ) : (
-        <p className={styles.empty}>No items.</p>
-      )}
-    </section>
-  );
-}
-
 function parseReview(artifact?: Artifact): ReviewData | null {
-  if (!artifact?.content) {
+  const content = toObject(artifact?.content);
+
+  if (!content) {
     return null;
   }
 
-  const summary = readString(artifact.content.summary);
+  const summary = readString(content.summary);
 
   if (!summary) {
     return null;
@@ -255,11 +219,19 @@ function parseReview(artifact?: Artifact): ReviewData | null {
 
   return {
     summary,
-    ambiguities: readStringArray(artifact.content.ambiguities),
-    suggestions: readStringArray(artifact.content.suggestions),
-    qualityIssues: readStringArray(artifact.content.quality_issues),
-    missingDetails: readStringArray(artifact.content.missing_details),
+    ambiguities: readStringArray(content.ambiguities),
+    suggestions: readStringArray(content.suggestions),
+    qualityIssues: readStringArray(content.quality_issues),
+    missingDetails: readStringArray(content.missing_details),
   };
+}
+
+function toObject(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+
+  return value as Record<string, unknown>;
 }
 
 function readString(value: unknown): string {

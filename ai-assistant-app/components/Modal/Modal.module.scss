@@ -6,10 +6,12 @@
   place-items: center;
   padding: 1rem;
   background: rgb(15 23 42 / 35%);
+  overflow-y: auto;
 }
 
 .panel {
   width: min(100%, 50rem);
+  max-height: calc(100vh - 2rem);
   border: 1px solid #e8e8ed;
   border-radius: 12px;
   background: #fff;
@@ -17,6 +19,7 @@
     0 18px 40px rgb(15 23 42 / 16%),
     0 4px 12px rgb(15 23 42 / 8%);
   padding: 1.25rem;
+  overflow-y: auto;
 }
 
 .title {

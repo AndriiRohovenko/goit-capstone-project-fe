@@ -1,11 +1,12 @@
 import { apiClient } from "@/lib/api-client";
 import type {
   Artifact,
+  ArtifactType,
   CreateArtifactRequest,
   UpdateArtifactRequest,
 } from "@/types/artifacts";
 
-export async function createArtifactByType(
+export async function createArtifactsByGenerationType(
   projectId: string,
   requirementId: string,
   generationTypePayload: CreateArtifactRequest,
@@ -20,7 +21,7 @@ export async function createArtifactByType(
 export async function updateArtifact(
   projectId: string,
   requirementId: string,
-  artifactType: string,
+  artifactType: ArtifactType,
   payload: UpdateArtifactRequest,
 ): Promise<Artifact> {
   const { data } = await apiClient.patch<Artifact>(
@@ -43,7 +44,7 @@ export async function getAllArtifacts(
 export async function getArtifactByType(
   projectId: string,
   requirementId: string,
-  artifactType: string,
+  artifactType: ArtifactType,
 ): Promise<Artifact> {
   const { data } = await apiClient.get<Artifact>(
     `/projects/${projectId}/requirements/${requirementId}/artifacts/${artifactType}`,
@@ -54,7 +55,7 @@ export async function getArtifactByType(
 export async function regenerateArtifactByType(
   projectId: string,
   requirementId: string,
-  artifactType: string,
+  artifactType: ArtifactType,
 ): Promise<Artifact> {
   const { data } = await apiClient.post<Artifact>(
     `/projects/${projectId}/requirements/${requirementId}/artifacts/${artifactType}/regenerate`,

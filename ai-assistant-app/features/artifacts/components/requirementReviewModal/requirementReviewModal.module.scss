@@ -1,0 +1,53 @@
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.modalSubtitle {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.reviewGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+.blockWide {
+  border: 1px solid #edf0f6;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.85rem;
+}
+
+.blockTitle {
+  margin: 0;
+  color: #101828;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.summary {
+  margin: 0.6rem 0 0;
+  color: #334155;
+  line-height: 1.65;
+}
+
+.empty {
+  margin: 0;
+  color: #667085;
+  line-height: 1.6;
+}
+
+@media (min-width: 980px) {
+  .reviewGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .blockWide {
+    grid-column: 1 / -1;
+  }
+}
