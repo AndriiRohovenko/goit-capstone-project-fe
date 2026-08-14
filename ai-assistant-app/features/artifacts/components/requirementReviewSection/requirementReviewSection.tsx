@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/Button";
-import { RequirementReviewForm } from "@/features/artifacts/components/requirementReviewForm/requirementReviewForm";
+import { RequirementReviewModal } from "@/features/artifacts/components/requirementReviewModal/requirementReviewModal";
 import styles from "./requirementReviewSection.module.scss";
 
 type RequirementReviewSectionProps = {
@@ -36,7 +36,7 @@ export function RequirementReviewSection({
         </Button>
       </section>
 
-      <RequirementReviewForm
+      <RequirementReviewModal
         projectId={projectId}
         requirementId={requirementId}
         isOpen={isOpen}

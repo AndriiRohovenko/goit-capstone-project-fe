@@ -11,9 +11,9 @@ import {
 } from "@/features/artifacts/queries/artifacts.queries";
 import { getApiErrorMessage } from "@/lib/api-error";
 import type { Artifact } from "@/types/artifacts";
-import styles from "./requirementReviewForm.module.scss";
+import styles from "./requirementReviewModal.module.scss";
 
-type RequirementReviewFormProps = {
+type RequirementReviewModalProps = {
   projectId: string;
   requirementId: string;
   isOpen: boolean;
@@ -30,12 +30,12 @@ type ReviewData = {
 
 const REVIEW_ARTIFACT_TYPE = "requirement_review";
 
-export function RequirementReviewForm({
+export function RequirementReviewModal({
   projectId,
   requirementId,
   isOpen,
   onClose,
-}: RequirementReviewFormProps) {
+}: RequirementReviewModalProps) {
   const [actionError, setActionError] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
