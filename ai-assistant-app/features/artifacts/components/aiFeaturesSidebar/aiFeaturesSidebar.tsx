@@ -2,6 +2,7 @@
 
 import { RequirementArtifactsSection } from "@/features/artifacts/components/requirementArtifactsSection/requirementsArtifactsSection";
 import { RequirementReviewSection } from "@/features/artifacts/components/requirementReviewSection/requirementReviewSection";
+import { TestsCoverageSection } from "@/features/testsCoverage/components/testsCoverageSection/testsCoverageSection";
 import styles from "./aiFeaturesSidebar.module.scss";
 
 type AiFeaturesSidebarProps = {
@@ -29,6 +30,11 @@ export function AiFeaturesSidebar({
           projectId={projectId}
           requirementId={requirementId}
           onShowArtifacts={onShowArtifacts}
+        />
+
+        <TestsCoverageSection
+          projectId={projectId}
+          requirementId={requirementId}
         />
       </div>
     </aside>

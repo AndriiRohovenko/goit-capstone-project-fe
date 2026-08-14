@@ -34,7 +34,7 @@ type RequirementDetailsFormValues = {
   business_rules: string;
 };
 
-type RequirementTab = "details" | "artifacts" | "test_coverage";
+type RequirementTab = "details" | "artifacts";
 
 export type { RequirementTab };
 
@@ -144,13 +144,6 @@ export function RequirementDetailsForm({
           onClick={() => onTabChange("artifacts")}
         >
           Artifacts
-        </button>
-        <button
-          type="button"
-          className={`${styles.tab} ${activeTab === "test_coverage" ? styles.tabActive : ""}`}
-          onClick={() => onTabChange("test_coverage")}
-        >
-          Test Coverage
         </button>
       </div>
 
@@ -326,16 +319,10 @@ export function RequirementDetailsForm({
         </>
       ) : (
         <section className={styles.section}>
-          {activeTab === "artifacts" ? (
-            <RequirementArtifactsTab
-              projectId={projectId}
-              requirementId={requirement.id}
-            />
-          ) : (
-            <p className={styles.mockedMessage}>
-              Test Coverage section is coming soon.
-            </p>
-          )}
+          <RequirementArtifactsTab
+            projectId={projectId}
+            requirementId={requirement.id}
+          />
         </section>
       )}
     </section>

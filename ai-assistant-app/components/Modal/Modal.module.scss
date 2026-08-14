@@ -28,3 +28,57 @@
   font-size: 1.125rem;
   font-weight: 700;
 }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.error {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.8125rem;
+}
+
+.infoBlock {
+  border: 1px solid #edf0f6;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.85rem;
+}
+
+.infoBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.infoBlockTitle {
+  margin: 0;
+  color: #101828;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.infoList {
+  margin: 0.65rem 0 0;
+  padding-left: 1.1rem;
+  color: #475467;
+}
+
+.infoList li {
+  line-height: 1.6;
+}
+
+.infoList li + li {
+  margin-top: 0.3rem;
+}
+
+.infoEmpty {
+  margin: 0;
+  color: #667085;
+  line-height: 1.6;
+}

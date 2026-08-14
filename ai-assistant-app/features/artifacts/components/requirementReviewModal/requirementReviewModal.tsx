@@ -2,8 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/Button";
-import { FormActions, FormError, FormInfoListBlock } from "@/components/Form";
-import { Modal } from "@/components/Modal";
+import {
+  Modal,
+  ModalActions,
+  ModalError,
+  ModalInfoListBlock,
+} from "@/components/Modal";
 import {
   useArtifacts,
   useCreateArtifact,
@@ -118,7 +122,7 @@ export function RequirementReviewModal({
             content.
           </p>
 
-          <FormActions>
+          <ModalActions>
             <Button
               type="button"
               onClick={() => void handleGenerateOrRegenerate()}
@@ -138,9 +142,9 @@ export function RequirementReviewModal({
             >
               Close
             </Button>
-          </FormActions>
+          </ModalActions>
 
-          <FormError message={actionError} />
+          <ModalError message={actionError} />
 
           {artifacts.isPending ? (
             <p className={styles.empty}>Loading review...</p>
@@ -151,12 +155,12 @@ export function RequirementReviewModal({
                 <p className={styles.summary}>{review.summary}</p>
               </section>
 
-              <FormInfoListBlock
+              <ModalInfoListBlock
                 title="Ambiguities"
                 items={review.ambiguities}
               />
 
-              <FormInfoListBlock
+              <ModalInfoListBlock
                 title="Suggestions"
                 items={review.suggestions}
                 action={
@@ -172,12 +176,12 @@ export function RequirementReviewModal({
                 }
               />
 
-              <FormInfoListBlock
+              <ModalInfoListBlock
                 title="Quality Issues"
                 items={review.qualityIssues}
               />
 
-              <FormInfoListBlock
+              <ModalInfoListBlock
                 title="Missing Details"
                 items={review.missingDetails}
                 action={
