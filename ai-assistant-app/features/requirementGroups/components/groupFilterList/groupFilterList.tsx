@@ -17,8 +17,6 @@ export function RequirementGroupFilterList({
   groups,
   isLoading,
   selectedGroupId,
-  totalCount,
-  countsByGroupId,
   onSelectGroup,
 }: RequirementGroupFilterListProps) {
   return (
@@ -41,7 +39,7 @@ export function RequirementGroupFilterList({
             active={selectedGroupId === null}
             icon={Folder}
             label="All Groups"
-            count={totalCount}
+
             onClick={() => onSelectGroup(null)}
           />
 
@@ -51,7 +49,6 @@ export function RequirementGroupFilterList({
               active={selectedGroupId === group.id}
               icon={Folder}
               label={group.name}
-              count={countsByGroupId[group.id] ?? 0}
               onClick={() => onSelectGroup(group.id)}
             />
           ))}
@@ -65,13 +62,11 @@ function FilterChip({
   active,
   icon: Icon,
   label,
-  count,
   onClick,
 }: {
   active: boolean;
   icon: LucideIcon;
   label: string;
-  count: number;
   onClick: () => void;
 }) {
   return (
@@ -85,7 +80,6 @@ function FilterChip({
         <Icon size={14} strokeWidth={2} />
       </span>
       <span className={styles.chipLabel}>{label}</span>
-      <span className={styles.count}>{count}</span>
     </button>
   );
 }
