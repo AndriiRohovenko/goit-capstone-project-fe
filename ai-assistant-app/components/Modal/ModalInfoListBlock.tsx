@@ -1,39 +1,35 @@
 import type { ReactNode } from "react";
+import { ModalBlock } from "./ModalBlock";
 import styles from "./Modal.module.scss";
 
-type ModalInfoListBlockProps = {
+type ModalInfoListBlockProps<T> = {
   title: string;
-  items: string[];
+  items: T[];
+  renderItem: (item: T, index: number) => ReactNode;
   action?: ReactNode;
   emptyText?: string;
   className?: string;
 };
 
-export function ModalInfoListBlock({
+export function ModalInfoListBlock<T>({
   title,
   items,
+  renderItem,
   action,
   emptyText = "No items.",
   className,
-}: ModalInfoListBlockProps) {
+}: ModalInfoListBlockProps<T>) {
   return (
-    <section
-      className={`${styles.infoBlock}${className ? ` ${className}` : ""}`}
-    >
-      <div className={styles.infoBlockHeader}>
-        <h4 className={styles.infoBlockTitle}>{title}</h4>
-        {action ?? null}
-      </div>
-
-      {items.length ? (
+    <ModalBlock title={title} action={action} className={className}>
+      {items.length > 0 ? (
         <ul className={styles.infoList}>
           {items.map((item, index) => (
-            <li key={`${title}-${item}-${index}`}>{item}</li>
+            <li key={`${title}-${index}`}>{renderItem(item, index)}</li>
           ))}
         </ul>
       ) : (
         <p className={styles.infoEmpty}>{emptyText}</p>
       )}
-    </section>
+    </ModalBlock>
   );
 }
