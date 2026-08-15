@@ -9,53 +9,42 @@ import {
   ModalError,
 } from "@/components/Modal";
 import {
-  useArtifacts,
-  useCreateArtifact,
-  useRegenerateArtifact,
-} from "@/features/artifacts/queries/artifacts.queries";
+  useCreateTestsCoverage,
+  useTestsCoverage,
+} from "@/features/testsCoverage/queries/testsCoverage.queries";
 import { copyToClipboard } from "@/lib/clipboard";
 import { getApiErrorMessage } from "@/lib/api-error";
 import { formatAiContentValue, hasRenderableContent } from "@/lib/parse";
-import styles from "./requirementReviewModal.module.scss";
+import styles from "./testsCoverageModal.module.scss";
 
-type RequirementReviewModalProps = {
+type TestsCoverageModalProps = {
   projectId: string;
   requirementId: string;
   isOpen: boolean;
   onClose: () => void;
 };
 
-const REVIEW_ARTIFACT_TYPE = "requirement_review";
-
-export function RequirementReviewModal({
+export function TestsCoverageModal({
   projectId,
   requirementId,
   isOpen,
   onClose,
-}: RequirementReviewModalProps) {
+}: TestsCoverageModalProps) {
   const [actionError, setActionError] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  const artifacts = useArtifacts(projectId, requirementId);
-  const createArtifact = useCreateArtifact();
-  const regenerateArtifact = useRegenerateArtifact();
+  const coverageQuery = useTestsCoverage(projectId, requirementId);
+  const createCoverage = useCreateTestsCoverage();
 
-  const reviewArtifact = useMemo(
-    () =>
-      artifacts.data?.find(
-        (artifact) => artifact.artifact_type === REVIEW_ARTIFACT_TYPE,
-      ),
-    [artifacts.data],
+  const coverageContent = coverageQuery.data?.content;
+  const coverageScore = coverageQuery.data?.coverage_score ?? null;
+  const hasCoverage = Boolean(coverageQuery.data);
+  const isGenerating = createCoverage.isPending;
+
+  const contentText = useMemo(
+    () => formatAiContentValue(coverageContent),
+    [coverageContent],
   );
-  const reviewContent = reviewArtifact?.content;
-
-  const reviewText = useMemo(
-    () => formatAiContentValue(reviewContent),
-    [reviewContent],
-  );
-
-  const hasReview = Boolean(reviewArtifact);
-  const isGenerating = createArtifact.isPending || regenerateArtifact.isPending;
 
   function handleClose() {
     if (isGenerating) {
@@ -71,23 +60,17 @@ export function RequirementReviewModal({
     setActionError(null);
 
     try {
-      if (hasReview) {
-        await regenerateArtifact.mutateAsync({
-          projectId,
-          requirementId,
-          artifactType: REVIEW_ARTIFACT_TYPE,
-        });
-        return;
-      }
-
-      await createArtifact.mutateAsync({
+      const result = await createCoverage.mutateAsync({
         projectId,
         requirementId,
-        payload: { generation_type: "requirement_review" },
       });
+
+      if (!result) {
+        setActionError("Failed to generate tests coverage review.");
+      }
     } catch (error) {
       setActionError(
-        getApiErrorMessage(error, "Failed to generate requirement review."),
+        getApiErrorMessage(error, "Failed to generate tests coverage review."),
       );
     }
   }
@@ -96,7 +79,7 @@ export function RequirementReviewModal({
     await copyToClipboard(
       { setCopiedKey, setActionError },
       "content",
-      reviewText,
+      contentText,
     );
   }
 
@@ -104,13 +87,16 @@ export function RequirementReviewModal({
     <Modal
       open={isOpen}
       onClose={handleClose}
-      title="AI Requirement Review"
+      title="AI Test Coverage Review"
       closeDisabled={isGenerating}
     >
       <div className={styles.modalBody}>
         <p className={styles.modalSubtitle}>
-          AI-generated review and suggestions based on the requirement content.
+          AI-generated test coverage analysis and recommendations.
         </p>
+        <div className={styles.coverageBadge}>
+          Coverage Score: {coverageScore ?? "N/A"}
+        </div>
 
         <ModalActions>
           <Button
@@ -120,15 +106,15 @@ export function RequirementReviewModal({
           >
             {isGenerating
               ? "Generating..."
-              : hasReview
-                ? "Regenerate review"
-                : "Generate review"}
+              : hasCoverage
+                ? "Regenerate coverage"
+                : "Generate coverage"}
           </Button>
           <Button
             type="button"
             variant="secondary"
             onClick={() => void handleCopyContent()}
-            disabled={!hasRenderableContent(reviewContent)}
+            disabled={!hasRenderableContent(coverageContent)}
           >
             {copiedKey === "content" ? "Copied" : "Copy content"}
           </Button>
@@ -144,12 +130,12 @@ export function RequirementReviewModal({
 
         <ModalError message={actionError} />
 
-        {artifacts.isPending ? (
-          <p className={styles.empty}>Loading review...</p>
+        {coverageQuery.isPending ? (
+          <p className={styles.empty}>Loading coverage...</p>
         ) : (
           <ModalContentSections
-            content={reviewContent}
-            emptyText="No review content available yet."
+            content={coverageContent}
+            emptyText="No coverage content available yet."
           />
         )}
       </div>

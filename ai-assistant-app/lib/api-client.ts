@@ -80,7 +80,6 @@ async function refreshSession() {
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh`,
     { refresh_token: currentRefreshToken },
     {
-      withCredentials: true,
       headers: { "Content-Type": "application/json" },
     },
   );

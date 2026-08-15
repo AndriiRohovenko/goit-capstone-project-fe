@@ -1,8 +1,8 @@
-export type Artifact = {
+export type Artifact<TContent = unknown> = {
   id: string;
   requirement_id: string;
   artifact_type: ArtifactType;
-  content: unknown;
+  content: TContent;
   is_edited: boolean;
   model: string;
   input_tokens: number;

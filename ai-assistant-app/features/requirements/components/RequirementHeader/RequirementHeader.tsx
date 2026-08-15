@@ -18,13 +18,15 @@ export function RequirementHeader({
 }: RequirementHeaderProps) {
   return (
     <section className={styles.card}>
-      <Link href={`/dashboard/projects/${projectId}`} className={styles.backLink}>
+      <Link
+        href={`/dashboard/projects/${projectId}`}
+        className={styles.backLink}
+      >
         <ArrowLeft size={14} strokeWidth={2.2} />
         Back to Requirements
       </Link>
 
       <div className={styles.headerRow}>
-       
         <div className={styles.copy}>
           <h1 className={styles.title}>{requirement.title}</h1>
           <p className={styles.subtitle}>
@@ -32,9 +34,15 @@ export function RequirementHeader({
           </p>
 
           <div className={styles.tags}>
-            <Tag tone={styles.type}>{formatLabel(requirement.requirement_type)}</Tag>
-            <Tag tone={priorityTone(requirement.priority)}>{formatLabel(requirement.priority)}</Tag>
-            <Tag tone={statusTone(requirement.status)}>{formatLabel(requirement.status)}</Tag>
+            <Tag tone={styles.type}>
+              {formatLabel(requirement.requirement_type)}
+            </Tag>
+            <Tag tone={priorityTone(requirement.priority)}>
+              {formatLabel(requirement.priority)}
+            </Tag>
+            <Tag tone={statusTone(requirement.status)}>
+              {formatLabel(requirement.status)}
+            </Tag>
             <span className={styles.groupTag}>
               <Folder size={14} strokeWidth={1.9} />
               {groupName ?? "No group"}
@@ -48,14 +56,6 @@ export function RequirementHeader({
 
 function Tag({ children, tone }: { children: string; tone: string }) {
   return <span className={`${styles.tag} ${tone}`}>{children}</span>;
-}
-
-function formatRequirementId(id: string) {
-  if (!id) {
-    return "REQ";
-  }
-
-  return id.length > 12 ? `REQ-${id.slice(0, 6).toUpperCase()}` : id.toUpperCase();
 }
 
 function formatLabel(value: string) {
