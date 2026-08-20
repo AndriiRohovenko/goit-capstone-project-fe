@@ -13,6 +13,7 @@ import {
   FormTextarea,
 } from "@/components/Form";
 import { Modal } from "@/components/Modal";
+import { SuccessMessage } from "@/components/SuccessMessage";
 import { getApiErrorMessage } from "@/lib/api-error";
 import { useRequirementGroups } from "@/features/requirementGroups/queries/requirementGroups.queries";
 import { useCreateRequirement } from "@/features/requirements/queries/requirement.queries";
@@ -67,6 +68,7 @@ type CreateRequirementProps = {
 
 export function CreateRequirement({ projectId }: CreateRequirementProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [phase, setPhase] = useState<"form" | "success">("form");
   const [error, setError] = useState<string | null>(null);
   const createRequirement = useCreateRequirement(projectId);
   const { data: requirementGroups, isPending: groupsPending } =
@@ -94,6 +96,7 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
 
     setIsOpen(false);
     setError(null);
+    setPhase("form");
   }
 
   async function handleSubmit(values: CreateRequirementFormValues) {
@@ -114,7 +117,7 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
         },
       });
 
-      setIsOpen(false);
+      setPhase("success");
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to create requirement."));
     }
@@ -127,6 +130,7 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
         className={styles.trigger}
         onClick={() => {
           setError(null);
+          setPhase("form");
           setIsOpen(true);
         }}
       >
@@ -140,16 +144,23 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
         title="Add Requirement"
         closeDisabled={createRequirement.isPending}
       >
-        <RequirementForm
-          submitLabel="Create requirement"
-          pendingLabel="Creating…"
-          isSubmitting={createRequirement.isPending}
-          groupsMissing={!requirementGroups?.length}
-          groupOptions={groupOptions}
-          error={error}
-          onCancel={handleClose}
-          onSubmit={handleSubmit}
-        />
+        {phase === "success" ? (
+          <SuccessMessage
+            title="Requirement created"
+            onClose={handleClose}
+          />
+        ) : (
+          <RequirementForm
+            submitLabel="Create requirement"
+            pendingLabel="Creating…"
+            isSubmitting={createRequirement.isPending}
+            groupsMissing={!requirementGroups?.length}
+            groupOptions={groupOptions}
+            error={error}
+            onCancel={handleClose}
+            onSubmit={handleSubmit}
+          />
+        )}
       </Modal>
     </>
   );

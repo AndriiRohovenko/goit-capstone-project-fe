@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/Button";
 import { Modal } from "@/components/Modal";
+import { SuccessMessage } from "@/components/SuccessMessage";
 import { getApiErrorMessage } from "@/lib/api-error";
 import { useCreateProject } from "@/features/projects/queries/projects.queries";
 import {
@@ -17,14 +18,24 @@ export function CreateProject() {
   const router = useRouter();
   const createProject = useCreateProject();
   const [isOpen, setIsOpen] = useState(false);
+  const [phase, setPhase] = useState<"form" | "success">("form");
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   function handleClose() {
     if (createProject.isPending) {
       return;
     }
+
+    const projectId = createdProjectId;
     setIsOpen(false);
     setError(null);
+    setPhase("form");
+    setCreatedProjectId(null);
+
+    if (projectId) {
+      router.push(`/dashboard/projects/${projectId}/context`);
+    }
   }
 
   async function handleSubmit(values: CreateProjectFormValues) {
@@ -35,8 +46,8 @@ export function CreateProject() {
         name: values.name.trim(),
         description: values.description.trim() || undefined,
       });
-      setIsOpen(false);
-      router.push(`/dashboard/projects/${project.id}/context`);
+      setCreatedProjectId(project.id);
+      setPhase("success");
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to create project."));
     }
@@ -49,6 +60,8 @@ export function CreateProject() {
         className={styles.trigger}
         onClick={() => {
           setError(null);
+          setPhase("form");
+          setCreatedProjectId(null);
           setIsOpen(true);
         }}
       >
@@ -62,14 +75,22 @@ export function CreateProject() {
         title="New Project"
         closeDisabled={createProject.isPending}
       >
-        <ProjectForm
-          submitLabel="Create project"
-          pendingLabel="Creating…"
-          isSubmitting={createProject.isPending}
-          error={error}
-          onCancel={handleClose}
-          onSubmit={handleSubmit}
-        />
+        {phase === "success" ? (
+          <SuccessMessage
+            title="Project created"
+            description="Opening the project context page..."
+            onClose={handleClose}
+          />
+        ) : (
+          <ProjectForm
+            submitLabel="Create project"
+            pendingLabel="Creating…"
+            isSubmitting={createProject.isPending}
+            error={error}
+            onCancel={handleClose}
+            onSubmit={handleSubmit}
+          />
+        )}
       </Modal>
     </>
   );

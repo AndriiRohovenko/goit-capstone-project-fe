@@ -12,6 +12,7 @@ import {
   FormTextarea,
 } from "@/components/Form";
 import { Modal } from "@/components/Modal";
+import { SuccessMessage } from "@/components/SuccessMessage";
 import { useCreateRequirementGroup } from "@/features/requirementGroups/queries/requirementGroups.queries";
 import { getApiErrorMessage } from "@/lib/api-error";
 import styles from "./addGroupForm.module.scss";
@@ -47,6 +48,7 @@ type AddGroupFormProps = {
 export function AddGroupForm({ projectId }: AddGroupFormProps) {
   const createGroup = useCreateRequirementGroup(projectId);
   const [isOpen, setIsOpen] = useState(false);
+  const [phase, setPhase] = useState<"form" | "success">("form");
   const [error, setError] = useState<string | null>(null);
 
   function handleClose() {
@@ -56,6 +58,7 @@ export function AddGroupForm({ projectId }: AddGroupFormProps) {
 
     setIsOpen(false);
     setError(null);
+    setPhase("form");
   }
 
   async function handleSubmit(values: RequirementGroupFormValues) {
@@ -66,7 +69,7 @@ export function AddGroupForm({ projectId }: AddGroupFormProps) {
         name: values.name.trim(),
         description: normalizeDescription(values.description),
       });
-      setIsOpen(false);
+      setPhase("success");
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to create requirement group."));
     }
@@ -79,6 +82,7 @@ export function AddGroupForm({ projectId }: AddGroupFormProps) {
         className={styles.trigger}
         onClick={() => {
           setError(null);
+          setPhase("form");
           setIsOpen(true);
         }}
       >
@@ -92,14 +96,18 @@ export function AddGroupForm({ projectId }: AddGroupFormProps) {
         title="Add Requirement Group"
         closeDisabled={createGroup.isPending}
       >
-        <RequirementGroupForm
-          submitLabel="Create group"
-          pendingLabel="Creating..."
-          isSubmitting={createGroup.isPending}
-          error={error}
-          onCancel={handleClose}
-          onSubmit={handleSubmit}
-        />
+        {phase === "success" ? (
+          <SuccessMessage title="Group created" onClose={handleClose} />
+        ) : (
+          <RequirementGroupForm
+            submitLabel="Create group"
+            pendingLabel="Creating..."
+            isSubmitting={createGroup.isPending}
+            error={error}
+            onCancel={handleClose}
+            onSubmit={handleSubmit}
+          />
+        )}
       </Modal>
     </>
   );
