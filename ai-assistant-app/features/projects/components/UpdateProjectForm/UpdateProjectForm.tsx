@@ -32,9 +32,15 @@ const statusOptions = [
 
 type UpdateProjectFormProps = {
   projectId: string;
+  onSuccess?: () => void;
+  onSubmittingChange?: (isSubmitting: boolean) => void;
 };
 
-export function UpdateProjectForm({ projectId }: UpdateProjectFormProps) {
+export function UpdateProjectForm({
+  projectId,
+  onSuccess,
+  onSubmittingChange,
+}: UpdateProjectFormProps) {
   const {
     data: project,
     isPending,
@@ -44,11 +50,10 @@ export function UpdateProjectForm({ projectId }: UpdateProjectFormProps) {
   } = useProject(projectId);
   const updateProject = useUpdateProject();
   const [formError, setFormError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   async function handleSubmit(values: UpdateProjectFormValues) {
     setFormError(null);
-    setSuccessMessage(null);
+    onSubmittingChange?.(true);
 
     try {
       await updateProject.mutateAsync({
@@ -59,8 +64,10 @@ export function UpdateProjectForm({ projectId }: UpdateProjectFormProps) {
           status: values.status,
         },
       });
-      setSuccessMessage("Project details saved.");
+      onSubmittingChange?.(false);
+      onSuccess?.();
     } catch (err) {
+      onSubmittingChange?.(false);
       setFormError(getApiErrorMessage(err, "Failed to update project."));
     }
   }
@@ -141,9 +148,6 @@ export function UpdateProjectForm({ projectId }: UpdateProjectFormProps) {
         </FormField>
 
         <FormError message={formError} />
-        {successMessage ? (
-          <p className={styles.success}>{successMessage}</p>
-        ) : null}
 
         <FormActions>
           <Button type="submit" disabled={updateProject.isPending}>

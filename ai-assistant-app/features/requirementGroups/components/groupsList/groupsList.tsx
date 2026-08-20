@@ -13,6 +13,7 @@ import {
 } from "react";
 import { Button } from "@/components/Button";
 import { Modal } from "@/components/Modal";
+import { SuccessMessage } from "@/components/SuccessMessage";
 import {
   RequirementGroupForm,
   type RequirementGroupFormValues,
@@ -134,6 +135,7 @@ function RequirementGroupRow({
   const updateGroup = useUpdateRequirementGroup(projectId);
   const deleteGroup = useDeleteRequirementGroup(projectId);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editPhase, setEditPhase] = useState<"form" | "success">("form");
   const [editError, setEditError] = useState<string | null>(null);
 
   async function handleDelete() {
@@ -165,7 +167,7 @@ function RequirementGroupRow({
           description: normalizeDescription(values.description),
         },
       });
-      setIsEditOpen(false);
+      setEditPhase("success");
       setOpenMenuId(null);
     } catch (err) {
       setEditError(getApiErrorMessage(err, "Failed to update requirement group."));
@@ -179,10 +181,14 @@ function RequirementGroupRow({
 
     setIsEditOpen(false);
     setEditError(null);
+    setEditPhase("form");
+    setOpenMenuId(null);
   }
 
   function openEditModal() {
     setEditError(null);
+    setEditPhase("form");
+    setOpenMenuId(null);
     setIsEditOpen(true);
   }
 
@@ -264,18 +270,22 @@ function RequirementGroupRow({
         title="Edit Requirement Group"
         closeDisabled={updateGroup.isPending}
       >
-        <RequirementGroupForm
-          defaultValues={{
-            name: group.name,
-            description: normalizeDescription(group.description),
-          }}
-          submitLabel="Save changes"
-          pendingLabel="Saving..."
-          isSubmitting={updateGroup.isPending}
-          error={editError}
-          onCancel={closeEditModal}
-          onSubmit={handleEditSubmit}
-        />
+        {editPhase === "success" ? (
+          <SuccessMessage title="Group updated" onClose={closeEditModal} />
+        ) : (
+          <RequirementGroupForm
+            defaultValues={{
+              name: group.name,
+              description: normalizeDescription(group.description),
+            }}
+            submitLabel="Save changes"
+            pendingLabel="Saving..."
+            isSubmitting={updateGroup.isPending}
+            error={editError}
+            onCancel={closeEditModal}
+            onSubmit={handleEditSubmit}
+          />
+        )}
       </Modal>
     </li>
   );

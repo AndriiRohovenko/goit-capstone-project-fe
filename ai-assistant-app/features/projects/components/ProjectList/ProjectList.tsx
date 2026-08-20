@@ -5,6 +5,7 @@ import { FilePenLine, FolderPen, MoreHorizontal, Trash2 } from "lucide-react";
 import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 import { Button } from "@/components/Button";
 import { Modal } from "@/components/Modal";
+import { SuccessMessage } from "@/components/SuccessMessage";
 import { getApiErrorMessage } from "@/lib/api-error";
 import {
   useDeleteProject,
@@ -22,6 +23,8 @@ export function ProjectList() {
   const deleteProject = useDeleteProject();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [detailsProjectId, setDetailsProjectId] = useState<string | null>(null);
+  const [isDetailsSubmitting, setIsDetailsSubmitting] = useState(false);
+  const [detailsPhase, setDetailsPhase] = useState<"form" | "success">("form");
   const menuRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
 
@@ -73,10 +76,14 @@ export function ProjectList() {
   function openDetailsModal(projectId: string) {
     setOpenMenuId(null);
     setDetailsProjectId(projectId);
+    setDetailsPhase("form");
+    setIsDetailsSubmitting(false);
   }
 
   function closeDetailsModal() {
     setDetailsProjectId(null);
+    setDetailsPhase("form");
+    setIsDetailsSubmitting(false);
   }
 
   return (
@@ -195,9 +202,24 @@ export function ProjectList() {
         open={Boolean(detailsProjectId)}
         onClose={closeDetailsModal}
         title="Update Project Details"
+        closeDisabled={isDetailsSubmitting}
       >
         {detailsProjectId ? (
-          <UpdateProjectForm projectId={detailsProjectId} />
+          detailsPhase === "success" ? (
+            <SuccessMessage
+              title="Saved successfully"
+              description="Project details saved."
+              onClose={closeDetailsModal}
+            />
+          ) : (
+            <UpdateProjectForm
+              projectId={detailsProjectId}
+              onSuccess={() => {
+                setDetailsPhase("success");
+              }}
+              onSubmittingChange={setIsDetailsSubmitting}
+            />
+          )
         ) : null}
       </Modal>
     </section>
