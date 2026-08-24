@@ -12,7 +12,7 @@ import {
   type RefObject,
 } from "react";
 import { Button } from "@/components/Button";
-import { Modal } from "@/components/Modal";
+import { DeleteItemModal, Modal } from "@/components/Modal";
 import { SuccessMessage } from "@/components/SuccessMessage";
 import {
   RequirementGroupForm,
@@ -137,22 +137,38 @@ function RequirementGroupRow({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editPhase, setEditPhase] = useState<"form" | "success">("form");
   const [editError, setEditError] = useState<string | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const requirementsHref = `/dashboard/projects/${projectId}?${new URLSearchParams({
+    groupId: group.id,
+  }).toString()}`;
 
-  async function handleDelete() {
-    const confirmed = window.confirm(
-      `Delete requirement group "${group.name}"? This cannot be undone.`,
-    );
+  function openDeleteModal() {
+    setOpenMenuId(null);
+    setDeleteError(null);
+    setIsDeleteOpen(true);
+  }
 
-    if (!confirmed) {
+  function closeDeleteModal() {
+    if (deleteGroup.isPending) {
       return;
     }
 
-    setOpenMenuId(null);
+    setIsDeleteOpen(false);
+    setDeleteError(null);
+  }
+
+  async function handleDeleteConfirm() {
+    if (!isDeleteOpen) {
+      return;
+    }
 
     try {
       await deleteGroup.mutateAsync(group.id);
+      setIsDeleteOpen(false);
+      setDeleteError(null);
     } catch (err) {
-      window.alert(getApiErrorMessage(err, "Failed to delete requirement group."));
+      setDeleteError(getApiErrorMessage(err, "Failed to delete requirement group."));
     }
   }
 
@@ -202,7 +218,7 @@ function RequirementGroupRow({
     <li className={styles.item}>
       <div className={styles.itemMain}>
         <Link
-          href={`/dashboard/projects/${projectId}`}
+          href={requirementsHref}
           className={styles.groupName}
         >
           {group.name}
@@ -254,7 +270,7 @@ function RequirementGroupRow({
                 className={`${styles.menuItem} ${styles.danger}`}
                 role="menuitem"
                 disabled={deleteGroup.isPending}
-                onClick={() => void handleDelete()}
+                onClick={openDeleteModal}
               >
                 <Trash2 size={16} strokeWidth={1.8} />
                 Delete group
@@ -287,6 +303,16 @@ function RequirementGroupRow({
           />
         )}
       </Modal>
+
+      <DeleteItemModal
+        open={isDeleteOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDeleteConfirm}
+        itemLabel="requirement group"
+        itemName={group.name}
+        isPending={deleteGroup.isPending}
+        error={deleteError}
+      />
     </li>
   );
 }

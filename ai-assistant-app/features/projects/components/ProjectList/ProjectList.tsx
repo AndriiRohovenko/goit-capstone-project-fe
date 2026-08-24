@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FilePenLine, FolderPen, MoreHorizontal, Trash2 } from "lucide-react";
 import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 import { Button } from "@/components/Button";
-import { Modal } from "@/components/Modal";
+import { DeleteItemModal, Modal } from "@/components/Modal";
 import { SuccessMessage } from "@/components/SuccessMessage";
 import { getApiErrorMessage } from "@/lib/api-error";
 import {
@@ -22,6 +22,8 @@ export function ProjectList() {
     
   const deleteProject = useDeleteProject();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [deleteProjectTarget, setDeleteProjectTarget] = useState<Project | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [detailsProjectId, setDetailsProjectId] = useState<string | null>(null);
   const [isDetailsSubmitting, setIsDetailsSubmitting] = useState(false);
   const [detailsPhase, setDetailsPhase] = useState<"form" | "success">("form");
@@ -50,20 +52,32 @@ export function ProjectList() {
     };
   }, []);
 
-  async function handleDelete(project: Project) {
-    const confirmed = window.confirm(
-      `Delete project “${project.name}”? This cannot be undone.`,
-    );
-    if (!confirmed) {
+  function openDeleteModal(project: Project) {
+    setOpenMenuId(null);
+    setDeleteError(null);
+    setDeleteProjectTarget(project);
+  }
+
+  function closeDeleteModal() {
+    if (deleteProject.isPending) {
       return;
     }
 
-    setOpenMenuId(null);
+    setDeleteProjectTarget(null);
+    setDeleteError(null);
+  }
+
+  async function handleDeleteConfirm() {
+    if (!deleteProjectTarget) {
+      return;
+    }
 
     try {
-      await deleteProject.mutateAsync(project.id);
+      await deleteProject.mutateAsync(deleteProjectTarget.id);
+      setDeleteProjectTarget(null);
+      setDeleteError(null);
     } catch (err) {
-      window.alert(getApiErrorMessage(err, "Failed to delete project."));
+      setDeleteError(getApiErrorMessage(err, "Failed to delete project."));
     }
   }
 
@@ -184,7 +198,7 @@ export function ProjectList() {
                         className={`${styles.menuItem} ${styles.danger}`}
                         role="menuitem"
                         disabled={deleteProject.isPending}
-                        onClick={() => void handleDelete(project)}
+                        onClick={() => openDeleteModal(project)}
                       >
                         <Trash2 size={16} strokeWidth={1.8} />
                         Delete project
@@ -222,6 +236,16 @@ export function ProjectList() {
           )
         ) : null}
       </Modal>
+
+      <DeleteItemModal
+        open={Boolean(deleteProjectTarget)}
+        onClose={closeDeleteModal}
+        onConfirm={handleDeleteConfirm}
+        itemLabel="project"
+        itemName={deleteProjectTarget?.name ?? ""}
+        isPending={deleteProject.isPending}
+        error={deleteError}
+      />
     </section>
   );
 }

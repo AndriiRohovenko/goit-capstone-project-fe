@@ -38,7 +38,7 @@ export function useCreateRequirement(projectId: string) {
   return useMutation({
     mutationFn: (payload: RequirementPayload) => createRequirement(projectId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: requirementKeys.lists(projectId) });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.list(projectId) });
     },
   });
 }
@@ -50,7 +50,7 @@ export function useUpdateRequirement(projectId: string, requirementId: string) {
     mutationFn: (payload: RequirementPayload) => updateRequirement(projectId, requirementId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: requirementKeys.detail(projectId, requirementId) });
-      queryClient.invalidateQueries({ queryKey: requirementKeys.lists(projectId) });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.list(projectId) });
     },
   });
 }
@@ -61,7 +61,7 @@ export function useDeleteRequirement(projectId: string) {
   return useMutation({
     mutationFn: (requirementId: string) => deleteRequirement(projectId, requirementId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: requirementKeys.lists(projectId) });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.list(projectId) });
     },
   });
 }

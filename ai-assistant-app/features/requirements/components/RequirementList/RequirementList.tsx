@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FilePenLine, MoreHorizontal, Trash2 } from "lucide-react";
 import { useEffect, useId, useRef, useState, type Dispatch, type MouseEvent, type ReactNode, type SetStateAction } from "react";
 import { Button } from "@/components/Button";
+import { DeleteItemModal } from "@/components/Modal";
 import { formatRelativeTime } from "@/features/projects/utils/format-relative-time";
 import { useDeleteRequirement } from "@/features/requirements/queries/requirement.queries";
 import { getApiErrorMessage } from "@/lib/api-error";
@@ -154,22 +155,35 @@ function RequirementListItem({
 }) {
   const deleteRequirement = useDeleteRequirement(projectId);
   const isOpen = openRequirementId === requirement.id;
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  async function handleDelete() {
-    const confirmed = window.confirm(
-      `Delete requirement “${requirement.title}”? This cannot be undone.`,
-    );
+  function openDeleteModal() {
+    setOpenRequirementId(null);
+    setDeleteError(null);
+    setIsDeleteOpen(true);
+  }
 
-    if (!confirmed) {
+  function closeDeleteModal() {
+    if (deleteRequirement.isPending) {
       return;
     }
 
-    setOpenRequirementId(null);
+    setIsDeleteOpen(false);
+    setDeleteError(null);
+  }
+
+  async function handleDeleteConfirm() {
+    if (!isDeleteOpen) {
+      return;
+    }
 
     try {
       await deleteRequirement.mutateAsync(requirement.id);
+      setIsDeleteOpen(false);
+      setDeleteError(null);
     } catch (err) {
-      window.alert(getApiErrorMessage(err, "Failed to delete requirement."));
+      setDeleteError(getApiErrorMessage(err, "Failed to delete requirement."));
     }
   }
 
@@ -250,7 +264,7 @@ function RequirementListItem({
                 className={`${styles.menuItem} ${styles.danger}`}
                 role="menuitem"
                 disabled={deleteRequirement.isPending}
-                onClick={() => void handleDelete()}
+                onClick={openDeleteModal}
               >
                 <Trash2 size={16} strokeWidth={1.8} />
                 Delete requirement
@@ -258,6 +272,16 @@ function RequirementListItem({
             </div>
           ) : null}
         </div>
+
+        <DeleteItemModal
+          open={isDeleteOpen}
+          onClose={closeDeleteModal}
+          onConfirm={handleDeleteConfirm}
+          itemLabel="requirement"
+          itemName={requirement.title}
+          isPending={deleteRequirement.isPending}
+          error={deleteError}
+        />
       </div>
     </li>
   );
