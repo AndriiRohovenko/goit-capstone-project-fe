@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/Button";
 import { RequirementGroupFilterList } from "@/features/requirementGroups/components/groupFilterList";
@@ -17,7 +17,9 @@ type ProjectPageContentProps = {
 
 function ProjectPageContent({ projectId }: ProjectPageContentProps) {
   const router = useRouter();
-  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const selectedGroupId = searchParams.get("groupId");
   const [page, setPage] = useState(1);
   const LIMIT = 7;
 
@@ -46,7 +48,18 @@ function ProjectPageContent({ projectId }: ProjectPageContentProps) {
   }, [requirementsData]);
 
   function handleSelectGroup(groupId: string | null) {
-    setSelectedGroupId(groupId);
+    const nextParams = new URLSearchParams(searchParams.toString());
+
+    if (groupId) {
+      nextParams.set("groupId", groupId);
+    } else {
+      nextParams.delete("groupId");
+    }
+
+    const query = nextParams.toString();
+    const nextUrl = query ? `${pathname}?${query}` : pathname;
+
+    router.replace(nextUrl, { scroll: false });
     setPage(1);
   }
 

@@ -9,6 +9,7 @@ type ModalProps = {
   title: string;
   children: ReactNode;
   closeDisabled?: boolean;
+  size?: "default" | "sm";
 };
 
 export function Modal({
@@ -17,6 +18,7 @@ export function Modal({
   title,
   children,
   closeDisabled = false,
+  size = "default",
 }: ModalProps) {
   const titleId = useId();
 
@@ -50,7 +52,7 @@ export function Modal({
       }}
     >
       <div
-        className={styles.panel}
+        className={`${styles.panel} ${size === "sm" ? styles.smallPanel : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

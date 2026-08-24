@@ -22,6 +22,10 @@
   overflow-y: auto;
 }
 
+.smallPanel {
+  width: min(100%, 26rem);
+}
+
 .title {
   margin: 0 0 1rem;
   color: #141827;
