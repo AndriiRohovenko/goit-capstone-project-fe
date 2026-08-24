@@ -3,31 +3,22 @@
 import { useMemo, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/Button";
-import { Modal } from "@/components/Modal";
 import { useIsMutating } from "@tanstack/react-query";
 import {
   ARTIFACT_GENERATE_MUTATION_KEY,
   useArtifacts,
   useCreateArtifact,
-  useRegenerateArtifact,
-  useUpdateArtifact,
 } from "@/features/artifacts/queries/artifacts.queries";
 import { getApiErrorMessage } from "@/lib/api-error";
 import type { ArtifactType } from "@/types/artifacts";
-import { ArtifactEditor } from "./ArtifactEditor";
+import { ArtifactEditorModal } from "./ArtifactEditorModal";
 import { ArtifactList } from "./ArtifactList";
-import { ArtifactPreview } from "./ArtifactPreview";
 import {
   ARTIFACT_ORDER,
   EXCLUDED_ARTIFACT_TYPES,
-  artifactLabel,
   isTestArtifactType,
 } from "./artifactTab.constants";
-import { createDraft, serializeDraft } from "./artifactTab.utils";
-import type {
-  ArtifactDraft,
-  RequirementArtifactsTabProps,
-} from "./artifactTab.types";
+import type { RequirementArtifactsTabProps } from "./artifactTab.types";
 import styles from "./requirementArtifactsTab.module.scss";
 
 export function RequirementArtifactsTab({
@@ -36,14 +27,10 @@ export function RequirementArtifactsTab({
 }: RequirementArtifactsTabProps) {
   const [selectedArtifactType, setSelectedArtifactType] =
     useState<ArtifactType | null>(null);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [draft, setDraft] = useState<ArtifactDraft | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const artifacts = useArtifacts(projectId, requirementId);
   const createArtifact = useCreateArtifact();
-  const updateArtifact = useUpdateArtifact();
-  const regenerateArtifact = useRegenerateArtifact();
   const activeGenerateMutations = useIsMutating({
     mutationKey: ARTIFACT_GENERATE_MUTATION_KEY,
   });
@@ -83,94 +70,15 @@ export function RequirementArtifactsTab({
     [artifacts.data],
   );
 
-  const isMutating =
-    createArtifact.isPending ||
-    updateArtifact.isPending ||
-    regenerateArtifact.isPending;
+  const isMutating = createArtifact.isPending;
   const isGeneratingArtifactsRequest = activeGenerateMutations > 0;
 
   function openArtifact(artifactType: ArtifactType) {
-    setActionError(null);
-    setIsEditMode(false);
-    setDraft(null);
     setSelectedArtifactType(artifactType);
   }
 
   function closeModal() {
-    if (isMutating) {
-      return;
-    }
-
-    setActionError(null);
-    setIsEditMode(false);
-    setDraft(null);
     setSelectedArtifactType(null);
-  }
-
-  function startEdit() {
-    if (!selectedArtifact) {
-      return;
-    }
-
-    setActionError(null);
-    setDraft(
-      createDraft(selectedArtifact.artifact_type, selectedArtifact.content),
-    );
-    setIsEditMode(true);
-  }
-
-  function cancelEdit() {
-    setActionError(null);
-    setIsEditMode(false);
-    setDraft(
-      selectedArtifact
-        ? createDraft(selectedArtifact.artifact_type, selectedArtifact.content)
-        : null,
-    );
-  }
-
-  async function handleSaveDraft() {
-    if (!selectedArtifact || !draft) {
-      return;
-    }
-
-    setActionError(null);
-
-    try {
-      await updateArtifact.mutateAsync({
-        projectId,
-        requirementId,
-        artifactType: selectedArtifact.artifact_type,
-        payload: {
-          content: serializeDraft(selectedArtifact.artifact_type, draft),
-        },
-      });
-      setIsEditMode(false);
-      setActionError(null);
-    } catch (error) {
-      setActionError(getApiErrorMessage(error, "Failed to update artifact."));
-    }
-  }
-
-  async function handleRegenerate() {
-    if (!selectedArtifact) {
-      return;
-    }
-
-    setActionError(null);
-
-    try {
-      await regenerateArtifact.mutateAsync({
-        projectId,
-        requirementId,
-        artifactType: selectedArtifact.artifact_type,
-      });
-      setActionError(null);
-    } catch (error) {
-      setActionError(
-        getApiErrorMessage(error, "Failed to regenerate artifact."),
-      );
-    }
   }
 
   async function handleGenerateOrRegenerateArtifacts() {
@@ -236,98 +144,18 @@ export function RequirementArtifactsTab({
             </div>
           ) : null}
         </div>
+
+        {actionError ? <p className={styles.error}>{actionError}</p> : null}
       </div>
 
-      <Modal
+      <ArtifactEditorModal
+        key={selectedArtifact?.id ?? selectedArtifactType ?? "artifact-modal"}
         open={Boolean(selectedArtifact)}
+        artifact={selectedArtifact ?? null}
+        projectId={projectId}
+        requirementId={requirementId}
         onClose={closeModal}
-        title={
-          selectedArtifact
-            ? artifactLabel(selectedArtifact.artifact_type)
-            : "Artifact"
-        }
-        closeDisabled={isMutating}
-      >
-        {selectedArtifact ? (
-          <div className={styles.modalBody}>
-            <p className={styles.modalSubtitle}>
-              {isEditMode
-                ? "Edit artifact fields and save your changes."
-                : "Preview generated artifact content. Use Edit to unlock fields."}
-            </p>
-
-            {isEditMode ? (
-              <ArtifactEditor
-                artifactType={selectedArtifact.artifact_type}
-                draft={draft}
-                disabled={isMutating}
-                onDraftChange={setDraft}
-              />
-            ) : (
-              <section className={styles.previewBlock}>
-                <h4 className={styles.previewTitle}>Artifact Content</h4>
-                <ArtifactPreview
-                  artifactType={selectedArtifact.artifact_type}
-                  content={selectedArtifact.content}
-                />
-              </section>
-            )}
-
-            <div className={styles.modalActions}>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => void handleRegenerate()}
-                disabled={isMutating}
-              >
-                {regenerateArtifact.isPending
-                  ? "Regenerating..."
-                  : "Regenerate"}
-              </Button>
-
-              {isEditMode ? (
-                <>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={cancelEdit}
-                    disabled={isMutating}
-                  >
-                    Cancel Edit
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => void handleSaveDraft()}
-                    disabled={isMutating}
-                  >
-                    {updateArtifact.isPending ? "Saving..." : "Save Changes"}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={startEdit}
-                  disabled={isMutating}
-                >
-                  Edit
-                </Button>
-              )}
-
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={closeModal}
-                disabled={isMutating}
-              >
-                Close
-              </Button>
-            </div>
-
-            {actionError ? <p className={styles.error}>{actionError}</p> : null}
-          </div>
-        ) : null}
-      </Modal>
+      />
     </>
   );
 }

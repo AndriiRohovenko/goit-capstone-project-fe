@@ -6,6 +6,7 @@ import {
   FormActions,
   FormError,
   FormField,
+  FormDirtyStateReporter,
   FormInput,
   FormTextarea,
 } from "@/components/Form";
@@ -19,6 +20,7 @@ type CreateProjectFormProps = {
   defaultValues?: Partial<CreateProjectFormValues>;
   onSubmit: (values: CreateProjectFormValues) => void | Promise<void>;
   onCancel?: () => void;
+  onDirtyChange?: (isDirty: boolean) => void;
   submitLabel: string;
   pendingLabel?: string;
   isSubmitting?: boolean;
@@ -34,6 +36,7 @@ export function ProjectForm({
   defaultValues,
   onSubmit,
   onCancel,
+  onDirtyChange,
   submitLabel,
   pendingLabel = "Saving…",
   isSubmitting = false,
@@ -44,6 +47,9 @@ export function ProjectForm({
       defaultValues={{ ...emptyValues, ...defaultValues }}
       onSubmit={onSubmit}
     >
+      <FormDirtyStateReporter<CreateProjectFormValues>
+        onDirtyChange={onDirtyChange}
+      />
       <FormField<CreateProjectFormValues> name="name" label="Name">
         <FormInput<CreateProjectFormValues>
           name="name"
