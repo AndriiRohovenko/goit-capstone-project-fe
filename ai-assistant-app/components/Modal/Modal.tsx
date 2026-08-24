@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, type ReactNode } from "react";
+import { useCallback, useEffect, useId, type ReactNode } from "react";
 import styles from "./Modal.module.scss";
 
 type ModalProps = {
@@ -9,6 +9,7 @@ type ModalProps = {
   title: string;
   children: ReactNode;
   closeDisabled?: boolean;
+  closeGuard?: () => boolean;
   size?: "default" | "sm";
 };
 
@@ -18,9 +19,15 @@ export function Modal({
   title,
   children,
   closeDisabled = false,
+  closeGuard,
   size = "default",
 }: ModalProps) {
   const titleId = useId();
+
+  const canClose = useCallback(
+    () => !closeDisabled && (closeGuard ? closeGuard() : true),
+    [closeDisabled, closeGuard],
+  );
 
   useEffect(() => {
     if (!open) {
@@ -28,14 +35,14 @@ export function Modal({
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape" && !closeDisabled) {
+      if (event.key === "Escape" && canClose()) {
         onClose();
       }
     }
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [closeDisabled, onClose, open]);
+  }, [canClose, onClose, open]);
 
   if (!open) {
     return null;
@@ -46,7 +53,7 @@ export function Modal({
       className={styles.backdrop}
       role="presentation"
       onClick={() => {
-        if (!closeDisabled) {
+        if (canClose()) {
           onClose();
         }
       }}

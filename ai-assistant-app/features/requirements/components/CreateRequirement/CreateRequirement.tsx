@@ -8,6 +8,7 @@ import {
   FormActions,
   FormError,
   FormField,
+  FormDirtyStateReporter,
   FormInput,
   FormSelect,
   FormTextarea,
@@ -70,6 +71,7 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [phase, setPhase] = useState<"form" | "success">("form");
   const [error, setError] = useState<string | null>(null);
+  const [isFormDirty, setIsFormDirty] = useState(false);
   const createRequirement = useCreateRequirement(projectId);
   const { data: requirementGroups, isPending: groupsPending } =
     useRequirementGroups(projectId);
@@ -95,6 +97,7 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
     }
 
     setIsOpen(false);
+    setIsFormDirty(false);
     setError(null);
     setPhase("form");
   }
@@ -117,6 +120,7 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
         },
       });
 
+      setIsFormDirty(false);
       setPhase("success");
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to create requirement."));
@@ -131,6 +135,7 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
         onClick={() => {
           setError(null);
           setPhase("form");
+          setIsFormDirty(false);
           setIsOpen(true);
         }}
       >
@@ -143,6 +148,7 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
         onClose={handleClose}
         title="Add Requirement"
         closeDisabled={createRequirement.isPending}
+        closeGuard={() => !isFormDirty}
       >
         {phase === "success" ? (
           <SuccessMessage
@@ -154,6 +160,7 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
             submitLabel="Create requirement"
             pendingLabel="Creating…"
             isSubmitting={createRequirement.isPending}
+            onDirtyChange={setIsFormDirty}
             groupsMissing={!requirementGroups?.length}
             groupOptions={groupOptions}
             error={error}
@@ -170,6 +177,7 @@ function RequirementForm({
   submitLabel,
   pendingLabel,
   isSubmitting,
+  onDirtyChange,
   groupsMissing,
   groupOptions,
   error,
@@ -179,6 +187,7 @@ function RequirementForm({
   submitLabel: string;
   pendingLabel: string;
   isSubmitting: boolean;
+  onDirtyChange?: (isDirty: boolean) => void;
   groupsMissing: boolean;
   groupOptions: Array<{ value: string; label: string }>;
   error?: string | null;
@@ -190,6 +199,9 @@ function RequirementForm({
       defaultValues={emptyValues}
       onSubmit={onSubmit}
     >
+      <FormDirtyStateReporter<CreateRequirementFormValues>
+        onDirtyChange={onDirtyChange}
+      />
       <FormField<CreateRequirementFormValues> name="title" label="Title">
         <FormInput<CreateRequirementFormValues>
           name="title"

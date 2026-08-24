@@ -8,6 +8,7 @@ import {
   FormActions,
   FormError,
   FormField,
+  FormDirtyStateReporter,
   FormInput,
   FormTextarea,
 } from "@/components/Form";
@@ -30,6 +31,7 @@ type RequirementGroupFormProps = {
   defaultValues?: Partial<RequirementGroupFormValues>;
   onSubmit: (values: RequirementGroupFormValues) => void | Promise<void>;
   onCancel?: () => void;
+  onDirtyChange?: (isDirty: boolean) => void;
   submitLabel: string;
   pendingLabel?: string;
   isSubmitting?: boolean;
@@ -50,6 +52,7 @@ export function AddGroupForm({ projectId }: AddGroupFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [phase, setPhase] = useState<"form" | "success">("form");
   const [error, setError] = useState<string | null>(null);
+  const [isFormDirty, setIsFormDirty] = useState(false);
 
   function handleClose() {
     if (createGroup.isPending) {
@@ -57,6 +60,7 @@ export function AddGroupForm({ projectId }: AddGroupFormProps) {
     }
 
     setIsOpen(false);
+    setIsFormDirty(false);
     setError(null);
     setPhase("form");
   }
@@ -69,6 +73,7 @@ export function AddGroupForm({ projectId }: AddGroupFormProps) {
         name: values.name.trim(),
         description: normalizeDescription(values.description),
       });
+      setIsFormDirty(false);
       setPhase("success");
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to create requirement group."));
@@ -83,6 +88,7 @@ export function AddGroupForm({ projectId }: AddGroupFormProps) {
         onClick={() => {
           setError(null);
           setPhase("form");
+          setIsFormDirty(false);
           setIsOpen(true);
         }}
       >
@@ -95,6 +101,7 @@ export function AddGroupForm({ projectId }: AddGroupFormProps) {
         onClose={handleClose}
         title="Add Requirement Group"
         closeDisabled={createGroup.isPending}
+        closeGuard={() => !isFormDirty}
       >
         {phase === "success" ? (
           <SuccessMessage title="Group created" onClose={handleClose} />
@@ -103,6 +110,7 @@ export function AddGroupForm({ projectId }: AddGroupFormProps) {
             submitLabel="Create group"
             pendingLabel="Creating..."
             isSubmitting={createGroup.isPending}
+            onDirtyChange={setIsFormDirty}
             error={error}
             onCancel={handleClose}
             onSubmit={handleSubmit}
@@ -117,6 +125,7 @@ export function RequirementGroupForm({
   defaultValues,
   onSubmit,
   onCancel,
+  onDirtyChange,
   submitLabel,
   pendingLabel = "Saving...",
   isSubmitting = false,
@@ -127,6 +136,9 @@ export function RequirementGroupForm({
       defaultValues={{ ...emptyValues, ...defaultValues }}
       onSubmit={onSubmit}
     >
+      <FormDirtyStateReporter<RequirementGroupFormValues>
+        onDirtyChange={onDirtyChange}
+      />
       <FormField<RequirementGroupFormValues> name="name" label="Group Name">
         <FormInput<RequirementGroupFormValues>
           name="name"

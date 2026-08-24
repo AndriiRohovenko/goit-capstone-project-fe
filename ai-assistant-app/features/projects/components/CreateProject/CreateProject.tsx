@@ -21,6 +21,7 @@ export function CreateProject() {
   const [phase, setPhase] = useState<"form" | "success">("form");
   const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isFormDirty, setIsFormDirty] = useState(false);
 
   function handleClose() {
     if (createProject.isPending) {
@@ -29,6 +30,7 @@ export function CreateProject() {
 
     const projectId = createdProjectId;
     setIsOpen(false);
+    setIsFormDirty(false);
     setError(null);
     setPhase("form");
     setCreatedProjectId(null);
@@ -47,6 +49,7 @@ export function CreateProject() {
         description: values.description.trim() || undefined,
       });
       setCreatedProjectId(project.id);
+      setIsFormDirty(false);
       setPhase("success");
     } catch (err) {
       setError(getApiErrorMessage(err, "Failed to create project."));
@@ -62,6 +65,7 @@ export function CreateProject() {
           setError(null);
           setPhase("form");
           setCreatedProjectId(null);
+          setIsFormDirty(false);
           setIsOpen(true);
         }}
       >
@@ -74,6 +78,7 @@ export function CreateProject() {
         onClose={handleClose}
         title="New Project"
         closeDisabled={createProject.isPending}
+        closeGuard={() => !isFormDirty}
       >
         {phase === "success" ? (
           <SuccessMessage
@@ -86,6 +91,7 @@ export function CreateProject() {
             submitLabel="Create project"
             pendingLabel="Creating…"
             isSubmitting={createProject.isPending}
+            onDirtyChange={setIsFormDirty}
             error={error}
             onCancel={handleClose}
             onSubmit={handleSubmit}
