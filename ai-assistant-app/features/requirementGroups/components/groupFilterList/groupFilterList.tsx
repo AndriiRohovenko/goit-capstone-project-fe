@@ -1,6 +1,7 @@
 "use client";
 
 import { Folder, type LucideIcon } from "lucide-react";
+import { Loader } from "@/components/Loader";
 import type { RequirementGroup } from "@/types/requirementGroup";
 import styles from "./groupFilterList.module.scss";
 
@@ -28,7 +29,7 @@ export function RequirementGroupFilterList({
       </div>
 
       {isLoading ? (
-        <p className={styles.status}>Loading groups...</p>
+        <Loader size="sm" label="Loading groups..." />
       ) : (
         <div
           className={styles.chips}

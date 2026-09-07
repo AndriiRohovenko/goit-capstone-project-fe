@@ -1,17 +1,16 @@
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   BarChart3,
   Check,
-  ClipboardCheck,
-  FileSearch,
   FolderKanban,
-  ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import { Button } from "@/components/Button";
 import { GuestOnly } from "@/features/auth/components/GuestOnly";
 import styles from "./Home.module.scss";
-
 
 const features = [
   {
@@ -43,7 +42,8 @@ const workflow = [
   {
     number: "02",
     title: "Add context",
-    description: "Bring in requirements and artifacts that explain what to test.",
+    description:
+      "Bring in requirements and artifacts that explain what to test.",
   },
   {
     number: "03",
@@ -53,6 +53,8 @@ const workflow = [
 ];
 
 export default function Home() {
+  const router = useRouter();
+
   return (
     <GuestOnly>
       <main className={styles.home}>
@@ -72,13 +74,17 @@ export default function Home() {
               insights.
             </p>
             <div className={styles.heroActions}>
-              <Link href="/register" className={styles.primaryAction}>
+              <Button type="button" onClick={() => router.push("/register")}>
                 Start for free
                 <ArrowRight size={18} aria-hidden="true" />
-              </Link>
-              <Link href="/login" className={styles.secondaryAction}>
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => router.push("/login")}
+              >
                 Log in to your workspace
-              </Link>
+              </Button>
             </div>
             <div className={styles.reassurance}>
               <span>
@@ -89,77 +95,12 @@ export default function Home() {
               </span>
             </div>
           </div>
-
-          <div className={styles.preview} aria-label="Product workflow preview">
-            <div className={styles.previewGlow} />
-            <div className={styles.previewWindow}>
-              <div className={styles.previewHeader}>
-                <div className={styles.windowControls} aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <span>Checkout redesign</span>
-                <span className={styles.liveBadge}>Active</span>
-              </div>
-              <div className={styles.previewBody}>
-                <div className={styles.previewSidebar} aria-hidden="true">
-                  <span className={styles.sidebarActive} />
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <div className={styles.previewContent}>
-                  <div className={styles.previewTitle}>
-                    <div>
-                      <span>Coverage overview</span>
-                      <strong>Requirements analysis</strong>
-                    </div>
-                    <ShieldCheck size={28} aria-hidden="true" />
-                  </div>
-                  <div className={styles.coverageCard}>
-                    <div className={styles.coverageScore}>
-                      <span>Coverage</span>
-                      <strong>86%</strong>
-                    </div>
-                    <div className={styles.progressTrack}>
-                      <span />
-                    </div>
-                    <div className={styles.coverageMeta}>
-                      <span>24 covered</span>
-                      <span>4 need attention</span>
-                    </div>
-                  </div>
-                  <div className={styles.requirementList}>
-                    <div>
-                      <ClipboardCheck size={18} aria-hidden="true" />
-                      <span>
-                        <strong>Payment validation</strong>
-                        8 test scenarios
-                      </span>
-                      <span className={styles.complete}>Covered</span>
-                    </div>
-                    <div>
-                      <FileSearch size={18} aria-hidden="true" />
-                      <span>
-                        <strong>Guest checkout flow</strong>
-                        5 test scenarios
-                      </span>
-                      <span className={styles.review}>Review</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </section>
 
         <section className={styles.features} aria-labelledby="features-title">
           <div className={styles.sectionHeading}>
             <span>Everything in one place</span>
-            <h2 id="features-title">
-              From requirements to confident coverage
-            </h2>
+            <h2 id="features-title">From requirements to confident coverage</h2>
             <p>
               A practical workspace designed to make test planning easier to
               manage, understand, and improve.
@@ -181,7 +122,9 @@ export default function Home() {
         <section className={styles.howItWorks} aria-labelledby="workflow-title">
           <div className={styles.workflowIntro}>
             <span>Simple by design</span>
-            <h2 id="workflow-title">Move from idea to insight in three steps</h2>
+            <h2 id="workflow-title">
+              Move from idea to insight in three steps
+            </h2>
             <p>
               Start with the information you already have. The workspace keeps
               the process structured as your project grows.
@@ -205,13 +148,16 @@ export default function Home() {
             <span>Ready to improve your test design?</span>
             <h2>Give every requirement the coverage it deserves.</h2>
           </div>
-          <Link href="/register" className={styles.ctaAction}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => router.push("/register")}
+            className={styles.ctaAction}
+          >
             Create your workspace
             <ArrowRight size={18} aria-hidden="true" />
-          </Link>
+          </Button>
         </section>
-
-       
       </main>
     </GuestOnly>
   );

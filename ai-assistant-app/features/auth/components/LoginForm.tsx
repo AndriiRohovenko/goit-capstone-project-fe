@@ -4,12 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/Button";
-import {
-  Form,
-  FormError,
-  FormField,
-  FormInput,
-} from "@/components/Form";
+import { Form, FormError, FormField, FormInput } from "@/components/Form";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { getApiErrorMessage } from "@/lib/api-error";
 import styles from "./Auth.module.scss";
@@ -87,13 +82,18 @@ export function LoginForm() {
       </FormField>
 
       <p className={styles.forgotPassword}>
-        <Link href="/reset-password">Forgot password?</Link>
+        <Link href="/reset-password">Reset password</Link>
       </p>
 
       <FormError message={error} />
 
-      <Button type="submit" className={styles.submit} disabled={pending}>
-        {pending ? "Signing in…" : "Sign in"}
+      <Button
+        type="submit"
+        className={styles.submit}
+        isLoading={pending}
+        loadingLabel="Signing in…"
+      >
+        Sign in
       </Button>
 
       <p className={styles.footer}>

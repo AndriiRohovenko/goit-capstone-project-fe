@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isAxiosError } from "axios";
+import { Loader } from "@/components/Loader";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { getApiErrorMessage } from "@/lib/api-error";
 import styles from "./Auth.module.scss";
@@ -56,14 +57,15 @@ export function VerifyEmail() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Email verification</h1>
-      <p className={status === "error" ? styles.error : styles.text}>
-        {message}
-      </p>
+      {status === "loading" ? (
+        <Loader label={message} centered />
+      ) : (
+        <p className={status === "error" ? styles.error : styles.text}>
+          {message}
+        </p>
+      )}
       {status === "error" ? (
-        <Link
-          href="/login"
-          className={styles.buttonLink}
-        >
+        <Link href="/login" className={styles.buttonLink}>
           Go to sign in
         </Link>
       ) : status === "success" ? (

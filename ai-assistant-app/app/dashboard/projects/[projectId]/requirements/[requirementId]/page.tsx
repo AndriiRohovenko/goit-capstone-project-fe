@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/Button";
+import { Loader } from "@/components/Loader";
 import { AiFeaturesSidebar } from "@/features/artifacts/components/aiFeaturesSidebar/aiFeaturesSidebar";
 import { RequirementHeader } from "@/features/requirements/components/RequirementHeader";
 import {
@@ -33,7 +34,7 @@ function RequirementPageContent({
   const { data: groups } = useRequirementGroups(projectId);
 
   if (isPending) {
-    return <p className={styles.status}>Loading requirement...</p>;
+    return <Loader label="Loading requirement..." centered />;
   }
 
   if (isError || !requirement) {

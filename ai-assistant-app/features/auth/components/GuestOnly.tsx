@@ -2,6 +2,7 @@
 
 import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { Loader } from "@/components/Loader";
 import { useAuth } from "@/features/auth/context/auth-context";
 import styles from "./Auth.module.scss";
 
@@ -19,7 +20,7 @@ export function GuestOnly({ children }: { children: ReactNode }) {
   if (!isReady) {
     return (
       <div className={styles.status}>
-        Checking session…
+        <Loader label="Checking session…" />
       </div>
     );
   }

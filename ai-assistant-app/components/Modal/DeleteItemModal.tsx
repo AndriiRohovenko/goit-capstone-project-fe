@@ -40,11 +40,22 @@ export function DeleteItemModal({
       <ModalError message={error} />
 
       <ModalActions>
-        <Button type="button" variant="secondary" onClick={onClose} disabled={isPending}>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onClose}
+          disabled={isPending}
+        >
           Cancel
         </Button>
-        <Button type="button" onClick={() => void onConfirm()} disabled={isPending}>
-          {isPending ? "Deleting..." : "Delete"}
+        <Button
+          type="button"
+          onClick={() => void onConfirm()}
+          disabled={isPending}
+          isLoading={isPending}
+          loadingLabel="Deleting..."
+        >
+          Delete
         </Button>
       </ModalActions>
     </Modal>

@@ -157,10 +157,10 @@ export function RequirementDetailsForm({
                   type="button"
                   onClick={() => submitRef.current?.click()}
                   disabled={updateRequirement.isPending}
+                  isLoading={updateRequirement.isPending}
+                  loadingLabel="Saving..."
                 >
-                  {updateRequirement.isPending
-                    ? "Saving..."
-                    : "Save Requirement"}
+                  Save Requirement
                 </Button>
               ) : (
                 <Button type="button" onClick={() => setIsEditing(true)}>

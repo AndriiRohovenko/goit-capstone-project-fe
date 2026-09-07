@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FilePenLine, FolderPen, MoreHorizontal, Trash2 } from "lucide-react";
 import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 import { Button } from "@/components/Button";
+import { Loader } from "@/components/Loader";
 import { DeleteItemModal, Modal } from "@/components/Modal";
 import { SuccessMessage } from "@/components/SuccessMessage";
 import { getApiErrorMessage } from "@/lib/api-error";
@@ -19,10 +20,11 @@ import styles from "./ProjectList.module.scss";
 export function ProjectList() {
   const { data, isPending, isError, error, refetch, isFetching } =
     useProjects();
-    
+
   const deleteProject = useDeleteProject();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [deleteProjectTarget, setDeleteProjectTarget] = useState<Project | null>(null);
+  const [deleteProjectTarget, setDeleteProjectTarget] =
+    useState<Project | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [detailsProjectId, setDetailsProjectId] = useState<string | null>(null);
   const [isDetailsSubmitting, setIsDetailsSubmitting] = useState(false);
@@ -106,11 +108,11 @@ export function ProjectList() {
         Projects list
       </span>
       {isFetching && !isPending ? (
-        <p className={styles.refreshing}>Refreshing…</p>
+        <Loader size="sm" label="Refreshing…" className={styles.refreshing} />
       ) : null}
 
       {isPending ? (
-        <p className={styles.status}>Loading projects…</p>
+        <Loader label="Loading projects…" centered />
       ) : isError ? (
         <div className={styles.errorState}>
           <p className={styles.error}>
@@ -160,7 +162,10 @@ export function ProjectList() {
                   <StatusBadge status={project.status} />
                 </div>
 
-                <div className={styles.actions} ref={openMenuId === project.id ? menuRef : undefined}>
+                <div
+                  className={styles.actions}
+                  ref={openMenuId === project.id ? menuRef : undefined}
+                >
                   <button
                     type="button"
                     className={styles.actionTrigger}

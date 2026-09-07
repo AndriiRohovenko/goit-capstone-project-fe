@@ -3,12 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/Button";
-import {
-  Form,
-  FormError,
-  FormField,
-  FormInput,
-} from "@/components/Form";
+import { Form, FormError, FormField, FormInput } from "@/components/Form";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { getApiErrorMessage } from "@/lib/api-error";
 import styles from "./Auth.module.scss";
@@ -138,8 +133,13 @@ export function RegisterForm() {
 
       <FormError message={error} />
 
-      <Button type="submit" className={styles.submit} disabled={pending}>
-        {pending ? "Creating account…" : "Register"}
+      <Button
+        type="submit"
+        className={styles.submit}
+        isLoading={pending}
+        loadingLabel="Creating account…"
+      >
+        Register
       </Button>
 
       <p className={styles.footer}>

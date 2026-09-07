@@ -151,10 +151,7 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
         closeGuard={() => !isFormDirty}
       >
         {phase === "success" ? (
-          <SuccessMessage
-            title="Requirement created"
-            onClose={handleClose}
-          />
+          <SuccessMessage title="Requirement created" onClose={handleClose} />
         ) : (
           <RequirementForm
             submitLabel="Create requirement"
@@ -305,8 +302,13 @@ function RequirementForm({
             Cancel
           </Button>
         ) : null}
-        <Button type="submit" disabled={isSubmitting || groupsMissing}>
-          {isSubmitting ? pendingLabel : submitLabel}
+        <Button
+          type="submit"
+          disabled={isSubmitting || groupsMissing}
+          isLoading={isSubmitting}
+          loadingLabel={pendingLabel}
+        >
+          {submitLabel}
         </Button>
       </FormActions>
     </Form>

@@ -4,12 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
-import {
-  Form,
-  FormError,
-  FormField,
-  FormInput,
-} from "@/components/Form";
+import { Form, FormError, FormField, FormInput } from "@/components/Form";
 import { resetPassword } from "@/features/auth/api/auth.api";
 import { getApiErrorMessage } from "@/lib/api-error";
 import styles from "./Auth.module.scss";
@@ -149,16 +144,20 @@ export function ResetPasswordForm() {
               message: "Password must be at least 8 characters.",
             },
             validate: (value, formValues) =>
-              value === formValues.newPassword ||
-              "New passwords do not match.",
+              value === formValues.newPassword || "New passwords do not match.",
           }}
         />
       </FormField>
 
       <FormError message={error} />
 
-      <Button type="submit" className={styles.submit} disabled={pending}>
-        {pending ? "Updating…" : "Update password"}
+      <Button
+        type="submit"
+        className={styles.submit}
+        isLoading={pending}
+        loadingLabel="Updating…"
+      >
+        Update password
       </Button>
 
       <p className={styles.footer}>
