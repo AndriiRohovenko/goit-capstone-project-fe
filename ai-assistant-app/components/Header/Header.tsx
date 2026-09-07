@@ -128,25 +128,6 @@ export function Header() {
                 <div className={styles.menu} role="menu">
                   <button
                     type="button"
-                    className={styles.menuItem}
-                    role="menuitem"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <UserRound size={18} strokeWidth={1.8} />
-                    My Profile
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.menuItem}
-                    role="menuitem"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Settings size={18} strokeWidth={1.8} />
-                    Preferences
-                  </button>
-                  <div className={styles.divider} />
-                  <button
-                    type="button"
                     className={`${styles.menuItem} ${styles.logout}`}
                     role="menuitem"
                     disabled={isLoggingOut}
