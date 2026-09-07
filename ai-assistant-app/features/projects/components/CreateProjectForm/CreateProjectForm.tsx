@@ -90,8 +90,13 @@ export function ProjectForm({
             Cancel
           </Button>
         ) : null}
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? pendingLabel : submitLabel}
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          isLoading={isSubmitting}
+          loadingLabel={pendingLabel}
+        >
+          {submitLabel}
         </Button>
       </FormActions>
     </Form>

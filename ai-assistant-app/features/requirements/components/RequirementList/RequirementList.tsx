@@ -2,8 +2,18 @@
 
 import Link from "next/link";
 import { FilePenLine, MoreHorizontal, Trash2 } from "lucide-react";
-import { useEffect, useId, useRef, useState, type Dispatch, type MouseEvent, type ReactNode, type SetStateAction } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type Dispatch,
+  type MouseEvent,
+  type ReactNode,
+  type SetStateAction,
+} from "react";
 import { Button } from "@/components/Button";
+import { Loader } from "@/components/Loader";
 import { DeleteItemModal } from "@/components/Modal";
 import { formatRelativeTime } from "@/features/projects/utils/format-relative-time";
 import { useDeleteRequirement } from "@/features/requirements/queries/requirement.queries";
@@ -41,7 +51,9 @@ export function RequirementList({
   onPageChange,
 }: RequirementListProps) {
   const titleId = useId();
-  const [openRequirementId, setOpenRequirementId] = useState<string | null>(null);
+  const [openRequirementId, setOpenRequirementId] = useState<string | null>(
+    null,
+  );
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -73,7 +85,7 @@ export function RequirementList({
       </span>
 
       {isLoading ? (
-        <p className={styles.status}>Loading requirements…</p>
+        <Loader label="Loading requirements…" centered />
       ) : isError ? (
         <div className={styles.errorState}>
           <p className={styles.error}>
@@ -112,7 +124,8 @@ export function RequirementList({
       {!isLoading && !isError && totalPages > 1 ? (
         <div className={styles.pagination}>
           <span className={styles.paginationInfo}>
-            Page {page} of {totalPages} &middot; {total} requirement{total !== 1 ? "s" : ""}
+            Page {page} of {totalPages} &middot; {total} requirement
+            {total !== 1 ? "s" : ""}
           </span>
           <div className={styles.paginationControls}>
             <button
@@ -190,7 +203,9 @@ function RequirementListItem({
   function toggleMenu(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     event.stopPropagation();
-    setOpenRequirementId((current) => (current === requirement.id ? null : requirement.id));
+    setOpenRequirementId((current) =>
+      current === requirement.id ? null : requirement.id,
+    );
   }
 
   return (
@@ -287,7 +302,13 @@ function RequirementListItem({
   );
 }
 
-function MetaBlock({ label, children }: { label: string; children: ReactNode }) {
+function MetaBlock({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
   return (
     <div className={styles.metaBlock}>
       <span className={styles.metaLabel}>{label}</span>

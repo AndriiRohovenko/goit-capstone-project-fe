@@ -6,14 +6,13 @@ import { usePathname } from "next/navigation";
 import {
   ChevronDown,
   ClipboardList,
-  ChevronRight,
   LogOut,
   Settings,
   UserRound,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ComponentType } from "react";
+import { Loader } from "@/components/Loader";
 import { useAuth } from "@/features/auth/context/auth-context";
-
 
 import styles from "./Header.module.scss";
 
@@ -24,13 +23,14 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Test Design", icon: ClipboardList, href: "/dashboard/projects" }
+  { label: "Test Design", icon: ClipboardList, href: "/dashboard/projects" },
 ];
 
 export function Header() {
   const { user, isAuthenticated, isReady, logout } = useAuth();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const initials = (user?.name ?? user?.email ?? "User")
     .split(/[\s@._-]+/)
@@ -149,10 +149,29 @@ export function Header() {
                     type="button"
                     className={`${styles.menuItem} ${styles.logout}`}
                     role="menuitem"
-                    onClick={() => void logout()}
+                    disabled={isLoggingOut}
+                    onClick={async () => {
+                      setIsLoggingOut(true);
+                      try {
+                        await logout();
+                      } finally {
+                        setIsLoggingOut(false);
+                        setIsMenuOpen(false);
+                      }
+                    }}
                   >
-                    <LogOut size={18} strokeWidth={1.8} />
-                    Logout
+                    {isLoggingOut ? (
+                      <Loader
+                        size="sm"
+                        variant="inherit"
+                        label="Logging out…"
+                      />
+                    ) : (
+                      <>
+                        <LogOut size={18} strokeWidth={1.8} />
+                        Logout
+                      </>
+                    )}
                   </button>
                 </div>
               ) : null}
@@ -161,7 +180,7 @@ export function Header() {
         ) : (
           <div className={styles.actions}>
             {!isReady ? (
-              <span className={styles.pending}>…</span>
+              <Loader size="sm" />
             ) : (
               <>
                 <Link href="/register" className={styles.textLink}>

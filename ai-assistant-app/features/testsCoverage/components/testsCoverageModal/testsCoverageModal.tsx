@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/Button";
+import { Loader } from "@/components/Loader";
 import {
   Modal,
   ModalActions,
@@ -103,12 +104,10 @@ export function TestsCoverageModal({
             type="button"
             onClick={() => void handleGenerateOrRegenerate()}
             disabled={isGenerating}
+            isLoading={isGenerating}
+            loadingLabel="Generating..."
           >
-            {isGenerating
-              ? "Generating..."
-              : hasCoverage
-                ? "Regenerate coverage"
-                : "Generate coverage"}
+            {hasCoverage ? "Regenerate coverage" : "Generate coverage"}
           </Button>
           <Button
             type="button"
@@ -131,7 +130,7 @@ export function TestsCoverageModal({
         <ModalError message={actionError} />
 
         {coverageQuery.isPending ? (
-          <p className={styles.empty}>Loading coverage...</p>
+          <Loader label="Loading coverage..." centered />
         ) : (
           <ModalContentSections
             content={coverageContent}

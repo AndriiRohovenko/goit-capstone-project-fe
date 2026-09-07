@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/Button";
+import { Loader } from "@/components/Loader";
 import {
   Modal,
   ModalActions,
@@ -117,12 +118,10 @@ export function RequirementReviewModal({
             type="button"
             onClick={() => void handleGenerateOrRegenerate()}
             disabled={isGenerating}
+            isLoading={isGenerating}
+            loadingLabel="Generating..."
           >
-            {isGenerating
-              ? "Generating..."
-              : hasReview
-                ? "Regenerate review"
-                : "Generate review"}
+            {hasReview ? "Regenerate review" : "Generate review"}
           </Button>
           <Button
             type="button"
@@ -145,7 +144,7 @@ export function RequirementReviewModal({
         <ModalError message={actionError} />
 
         {artifacts.isPending ? (
-          <p className={styles.empty}>Loading review...</p>
+          <Loader label="Loading review..." centered />
         ) : (
           <ModalContentSections
             content={reviewContent}

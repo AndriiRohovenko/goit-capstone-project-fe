@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/Button";
+import { Loader } from "@/components/Loader";
 import { useIsMutating } from "@tanstack/react-query";
 import {
   ARTIFACT_GENERATE_MUTATION_KEY,
@@ -125,7 +126,7 @@ export function RequirementArtifactsTab({
           className={`${styles.contentRegion}${isGeneratingArtifactsRequest ? ` ${styles.contentRegionBusy}` : ""}`}
         >
           {artifacts.isPending ? (
-            <p className={styles.empty}>Loading artifacts...</p>
+            <Loader label="Loading artifacts..." centered />
           ) : sortedArtifacts.length ? (
             <ArtifactList artifacts={sortedArtifacts} onOpen={openArtifact} />
           ) : (
@@ -136,11 +137,8 @@ export function RequirementArtifactsTab({
           )}
 
           {isGeneratingArtifactsRequest ? (
-            <div className={styles.overlay} role="status" aria-live="polite">
-              <span className={styles.spinner} aria-hidden="true" />
-              <span className={styles.overlayText}>
-                Generating artifacts...
-              </span>
+            <div className={styles.overlay}>
+              <Loader size="sm" label="Generating artifacts..." />
             </div>
           ) : null}
         </div>

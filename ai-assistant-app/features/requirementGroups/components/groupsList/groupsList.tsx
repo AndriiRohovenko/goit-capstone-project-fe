@@ -12,6 +12,7 @@ import {
   type RefObject,
 } from "react";
 import { Button } from "@/components/Button";
+import { Loader } from "@/components/Loader";
 import { DeleteItemModal, Modal } from "@/components/Modal";
 import { SuccessMessage } from "@/components/SuccessMessage";
 import {
@@ -83,7 +84,7 @@ export function RequirementGroupsList({
       </span>
 
       {isLoading ? (
-        <p className={styles.status}>Loading groups...</p>
+        <Loader label="Loading groups..." centered />
       ) : isError ? (
         <div className={styles.errorState}>
           <p className={styles.error}>
@@ -139,9 +140,11 @@ function RequirementGroupRow({
   const [editError, setEditError] = useState<string | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  const requirementsHref = `/dashboard/projects/${projectId}?${new URLSearchParams({
-    groupId: group.id,
-  }).toString()}`;
+  const requirementsHref = `/dashboard/projects/${projectId}?${new URLSearchParams(
+    {
+      groupId: group.id,
+    },
+  ).toString()}`;
 
   function openDeleteModal() {
     setOpenMenuId(null);
@@ -168,7 +171,9 @@ function RequirementGroupRow({
       setIsDeleteOpen(false);
       setDeleteError(null);
     } catch (err) {
-      setDeleteError(getApiErrorMessage(err, "Failed to delete requirement group."));
+      setDeleteError(
+        getApiErrorMessage(err, "Failed to delete requirement group."),
+      );
     }
   }
 
@@ -186,7 +191,9 @@ function RequirementGroupRow({
       setEditPhase("success");
       setOpenMenuId(null);
     } catch (err) {
-      setEditError(getApiErrorMessage(err, "Failed to update requirement group."));
+      setEditError(
+        getApiErrorMessage(err, "Failed to update requirement group."),
+      );
     }
   }
 
@@ -217,10 +224,7 @@ function RequirementGroupRow({
   return (
     <li className={styles.item}>
       <div className={styles.itemMain}>
-        <Link
-          href={requirementsHref}
-          className={styles.groupName}
-        >
+        <Link href={requirementsHref} className={styles.groupName}>
           {group.name}
         </Link>
 

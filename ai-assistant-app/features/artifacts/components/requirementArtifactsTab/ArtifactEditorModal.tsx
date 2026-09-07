@@ -5,7 +5,10 @@ import { Button } from "@/components/Button";
 import { Modal } from "@/components/Modal";
 import { getApiErrorMessage } from "@/lib/api-error";
 import type { Artifact } from "@/types/artifacts";
-import { useRegenerateArtifact, useUpdateArtifact } from "@/features/artifacts/queries/artifacts.queries";
+import {
+  useRegenerateArtifact,
+  useUpdateArtifact,
+} from "@/features/artifacts/queries/artifacts.queries";
 import { ArtifactEditor } from "./ArtifactEditor";
 import { ArtifactPreview } from "./ArtifactPreview";
 import { artifactLabel } from "./artifactTab.constants";
@@ -131,8 +134,10 @@ export function ArtifactEditorModal({
             variant="secondary"
             onClick={() => void handleRegenerate()}
             disabled={isMutating}
+            isLoading={regenerateArtifact.isPending}
+            loadingLabel="Regenerating..."
           >
-            {regenerateArtifact.isPending ? "Regenerating..." : "Regenerate"}
+            Regenerate
           </Button>
 
           {controller.isEditMode ? (
@@ -152,8 +157,10 @@ export function ArtifactEditorModal({
                 type="button"
                 onClick={() => void handleSaveDraft()}
                 disabled={isMutating}
+                isLoading={updateArtifact.isPending}
+                loadingLabel="Saving..."
               >
-                {updateArtifact.isPending ? "Saving..." : "Save Changes"}
+                Save Changes
               </Button>
             </>
           ) : (

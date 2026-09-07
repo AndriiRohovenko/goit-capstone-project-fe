@@ -83,13 +83,11 @@ export function RequirementArtifactsSection({
         className={styles.actionButton}
         onClick={() => void handleGenerateOrRegenerate()}
         disabled={artifacts.isPending || isGenerating}
+        isLoading={isGenerating}
+        loadingLabel={hasGenerated ? "Regenerating..." : "Generating..."}
       >
         <Sparkles size={16} strokeWidth={2.1} />
-        {isGenerating
-          ? "Generating..."
-          : hasGenerated
-            ? "Regenerate Artifacts"
-            : "Generate Artifacts"}
+        {hasGenerated ? "Regenerate Artifacts" : "Generate Artifacts"}
       </Button>
 
       <Button

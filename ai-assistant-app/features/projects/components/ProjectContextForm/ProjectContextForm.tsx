@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Pencil } from "lucide-react";
 import { isAxiosError } from "axios";
 import { Button } from "@/components/Button";
+import { Loader } from "@/components/Loader";
 import {
   Form,
   FormActions,
@@ -105,17 +106,16 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
     refetch,
   } = useProjectContext(projectId);
   const updateContext = useUpdateProjectContext();
-  const [editingField, setEditingField] = useState<ContextFieldKey | null>(null);
+  const [editingField, setEditingField] = useState<ContextFieldKey | null>(
+    null,
+  );
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const isMissingContext =
     isAxiosError(error) && error.response?.status === 404;
 
-  async function handleSubmitField(
-    field: ContextFieldKey,
-    value: string,
-  ) {
+  async function handleSubmitField(field: ContextFieldKey, value: string) {
     setFormError(null);
     setSuccessMessage(null);
 
@@ -155,10 +155,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
         setFormError("Additional context must be valid JSON.");
         return;
       }
-      if (
-        err instanceof Error &&
-        err.message.includes("Additional context")
-      ) {
+      if (err instanceof Error && err.message.includes("Additional context")) {
         setFormError(err.message);
         return;
       }
@@ -167,7 +164,7 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
   }
 
   if (isPending) {
-    return <p className={styles.status}>Loading project context…</p>;
+    return <Loader label="Loading project context…" centered />;
   }
 
   if (isError && !isMissingContext) {
@@ -232,7 +229,9 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
         placeholder="What does this product do?"
         rows={4}
         isEditing={editingField === "product_description"}
-        canEdit={editingField === null || editingField === "product_description"}
+        canEdit={
+          editingField === null || editingField === "product_description"
+        }
         pending={updateContext.isPending}
         onEdit={() => {
           setFormError(null);
@@ -316,7 +315,9 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
         value={defaultValues.authentication_type}
         options={authenticationOptions}
         isEditing={editingField === "authentication_type"}
-        canEdit={editingField === null || editingField === "authentication_type"}
+        canEdit={
+          editingField === null || editingField === "authentication_type"
+        }
         pending={updateContext.isPending}
         onEdit={() => {
           setFormError(null);
@@ -338,7 +339,9 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
         rows={3}
         asList
         isEditing={editingField === "supported_platforms"}
-        canEdit={editingField === null || editingField === "supported_platforms"}
+        canEdit={
+          editingField === null || editingField === "supported_platforms"
+        }
         pending={updateContext.isPending}
         onEdit={() => {
           setFormError(null);
@@ -375,7 +378,9 @@ export function ProjectContextForm({ projectId }: ProjectContextFormProps) {
       />
 
       <FormError message={formError} />
-      {successMessage ? <p className={styles.success}>{successMessage}</p> : null}
+      {successMessage ? (
+        <p className={styles.success}>{successMessage}</p>
+      ) : null}
     </div>
   );
 }
@@ -445,8 +450,13 @@ function EditableTextContextSection({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={pending}>
-              {pending ? "Saving..." : "Save"}
+            <Button
+              type="submit"
+              disabled={pending}
+              isLoading={pending}
+              loadingLabel="Saving..."
+            >
+              Save
             </Button>
           </FormActions>
         </Form>
@@ -531,8 +541,13 @@ function EditableInputContextSection({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={pending}>
-              {pending ? "Saving..." : "Save"}
+            <Button
+              type="submit"
+              disabled={pending}
+              isLoading={pending}
+              loadingLabel="Saving..."
+            >
+              Save
             </Button>
           </FormActions>
         </Form>
@@ -606,8 +621,13 @@ function EditableSelectContextSection({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={pending}>
-              {pending ? "Saving..." : "Save"}
+            <Button
+              type="submit"
+              disabled={pending}
+              isLoading={pending}
+              loadingLabel="Saving..."
+            >
+              Save
             </Button>
           </FormActions>
         </Form>

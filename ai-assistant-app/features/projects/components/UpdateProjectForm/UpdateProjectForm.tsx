@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/Button";
+import { Loader } from "@/components/Loader";
 import {
   Form,
   FormActions,
@@ -73,7 +74,7 @@ export function UpdateProjectForm({
   }
 
   if (isPending) {
-    return <p className={styles.status}>Loading project…</p>;
+    return <Loader label="Loading project…" centered />;
   }
 
   if (isError || !project) {
@@ -150,8 +151,13 @@ export function UpdateProjectForm({
         <FormError message={formError} />
 
         <FormActions>
-          <Button type="submit" disabled={updateProject.isPending}>
-            {updateProject.isPending ? "Saving…" : "Save changes"}
+          <Button
+            type="submit"
+            disabled={updateProject.isPending}
+            isLoading={updateProject.isPending}
+            loadingLabel="Saving…"
+          >
+            Save changes
           </Button>
         </FormActions>
       </Form>
