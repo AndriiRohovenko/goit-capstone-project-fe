@@ -7,7 +7,9 @@ import {
   FormError,
   FormField,
   FormSelect,
+  FormStringListField,
   FormTextarea,
+  sanitizeStringList,
 } from "@/components/Form";
 import { RequirementArtifactsTab } from "@/features/artifacts/components/requirementArtifactsTab/requirementArtifactsTab";
 import { useUpdateRequirement } from "@/features/requirements/queries/requirement.queries";
@@ -30,8 +32,8 @@ type RequirementDetailsFormValues = {
   priority: string;
   status: string;
   description: string;
-  acceptance_criteria: string;
-  business_rules: string;
+  acceptance_criteria: string[];
+  business_rules: string[];
 };
 
 type RequirementTab = "details" | "artifacts";
@@ -98,8 +100,8 @@ export function RequirementDetailsForm({
       priority: requirement.priority || "medium",
       status: requirement.status || "draft",
       description: requirement.description ?? "",
-      acceptance_criteria: joinLines(requirement.acceptance_criteria),
-      business_rules: joinLines(requirement.business_rules),
+      acceptance_criteria: requirement.acceptance_criteria ?? [],
+      business_rules: requirement.business_rules ?? [],
     }),
     [requirement],
   );
@@ -115,8 +117,8 @@ export function RequirementDetailsForm({
       priority: values.priority,
       status: values.status,
       description: values.description.trim(),
-      acceptance_criteria: splitLines(values.acceptance_criteria),
-      business_rules: splitLines(values.business_rules),
+      acceptance_criteria: sanitizeStringList(values.acceptance_criteria),
+      business_rules: sanitizeStringList(values.business_rules),
     };
 
     try {
@@ -259,10 +261,11 @@ export function RequirementDetailsForm({
               <h3 className={styles.sectionTitle}>Acceptance Criteria</h3>
               {isEditing ? (
                 <div className={styles.fieldset}>
-                  <FormTextarea<RequirementDetailsFormValues>
+                  <FormStringListField<RequirementDetailsFormValues>
                     name="acceptance_criteria"
-                    rows={5}
-                    placeholder="One criterion per line"
+                    addLabel="Add criterion"
+                    itemPlaceholder="Describe a criterion"
+                    itemAriaLabelPrefix="criterion"
                     disabled={updateRequirement.isPending}
                   />
                 </div>
@@ -287,10 +290,11 @@ export function RequirementDetailsForm({
               <h3 className={styles.sectionTitle}>Business Rules</h3>
               {isEditing ? (
                 <div className={styles.fieldset}>
-                  <FormTextarea<RequirementDetailsFormValues>
+                  <FormStringListField<RequirementDetailsFormValues>
                     name="business_rules"
-                    rows={5}
-                    placeholder="One rule per line"
+                    addLabel="Add rule"
+                    itemPlaceholder="Describe a rule"
+                    itemAriaLabelPrefix="rule"
                     disabled={updateRequirement.isPending}
                   />
                 </div>
@@ -327,17 +331,6 @@ export function RequirementDetailsForm({
       )}
     </section>
   );
-}
-
-function splitLines(value: string): string[] {
-  return value
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
-function joinLines(values: string[] | undefined, separator = "\n"): string {
-  return values?.length ? values.join(separator) : "";
 }
 
 function ensureOption(

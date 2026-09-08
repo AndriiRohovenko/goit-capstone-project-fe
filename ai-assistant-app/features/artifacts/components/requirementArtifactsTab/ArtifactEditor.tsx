@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/Button";
+import { EditableStringList } from "@/components/Form";
 import type {
   ArtifactEditorProps,
   ScenarioItem,
@@ -321,16 +322,16 @@ function StringListEditor({
   return (
     <div className={styles.editorSection}>
       <h4 className={styles.editorTitle}>{title}</h4>
-      <label className={styles.editorField}>
-        <span className={styles.editorLabel}>{label} (one per line)</span>
-        <textarea
-          className={styles.editorTextarea}
-          rows={10}
-          value={value.join("\n")}
-          onChange={(event) => onChange(splitLines(event.target.value))}
+      <div className={styles.editorField}>
+        <span className={styles.editorLabel}>{label}</span>
+        <EditableStringList
+          items={value}
+          onChange={onChange}
           disabled={disabled}
+          addLabel="Add item"
+          itemAriaLabelPrefix="item"
         />
-      </label>
+      </div>
     </div>
   );
 }
