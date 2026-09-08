@@ -1,11 +1,13 @@
 "use client";
 
-import { Folder, type LucideIcon } from "lucide-react";
+import { Folder, FolderPlus, type LucideIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Loader } from "@/components/Loader";
 import type { RequirementGroup } from "@/types/requirementGroup";
 import styles from "./groupFilterList.module.scss";
 
 type RequirementGroupFilterListProps = {
+  projectId: string;
   groups?: RequirementGroup[];
   isLoading: boolean;
   selectedGroupId: string | null;
@@ -15,11 +17,15 @@ type RequirementGroupFilterListProps = {
 };
 
 export function RequirementGroupFilterList({
+  projectId,
   groups,
   isLoading,
   selectedGroupId,
   onSelectGroup,
 }: RequirementGroupFilterListProps) {
+  const router = useRouter();
+  const hasGroups = Boolean(groups?.length);
+
   return (
     <section className={styles.card} aria-labelledby="requirement-group-filter">
       <div className={styles.heading}>
@@ -36,13 +42,25 @@ export function RequirementGroupFilterList({
           role="list"
           aria-label="Requirement groups filter"
         >
-          <FilterChip
-            active={selectedGroupId === null}
-            icon={Folder}
-            label="All Groups"
-
-            onClick={() => onSelectGroup(null)}
-          />
+          {hasGroups ? (
+            <FilterChip
+              active={selectedGroupId === null}
+              icon={Folder}
+              label="All Groups"
+              onClick={() => onSelectGroup(null)}
+            />
+          ) : (
+            <FilterChip
+              active={false}
+              icon={FolderPlus}
+              label="Add Group"
+              onClick={() =>
+                router.push(
+                  `/dashboard/projects/${projectId}/requirements/groups`,
+                )
+              }
+            />
+          )}
 
           {groups?.map((group) => (
             <FilterChip

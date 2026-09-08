@@ -1,7 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/Button";
 import { RequirementGroupFilterList } from "@/features/requirementGroups/components/groupFilterList";
@@ -29,7 +34,11 @@ function ProjectPageContent({ projectId }: ProjectPageContentProps) {
     isError: requirementsError,
     error: requirementsErrorValue,
     refetch: refetchRequirements,
-  } = useRequirements(projectId, { groupId: selectedGroupId ?? undefined, page, limit: LIMIT });
+  } = useRequirements(projectId, {
+    groupId: selectedGroupId ?? undefined,
+    page,
+    limit: LIMIT,
+  });
   const {
     data: requirementGroups,
     isPending: groupsPending,
@@ -64,7 +73,8 @@ function ProjectPageContent({ projectId }: ProjectPageContentProps) {
   }
 
   const groupNameById = useMemo(
-    () => new Map((requirementGroups ?? []).map((group) => [group.id, group.name])),
+    () =>
+      new Map((requirementGroups ?? []).map((group) => [group.id, group.name])),
     [requirementGroups],
   );
 
@@ -84,7 +94,11 @@ function ProjectPageContent({ projectId }: ProjectPageContentProps) {
           <Button
             type="button"
             variant="secondary"
-            onClick={() => router.push(`/dashboard/projects/${projectId}/requirements/groups`)}
+            onClick={() =>
+              router.push(
+                `/dashboard/projects/${projectId}/requirements/groups`,
+              )
+            }
           >
             <Settings size={16} strokeWidth={2} />
             Manage Groups
@@ -95,6 +109,7 @@ function ProjectPageContent({ projectId }: ProjectPageContentProps) {
       </header>
 
       <RequirementGroupFilterList
+        projectId={projectId}
         groups={requirementGroups}
         isLoading={groupsPending}
         selectedGroupId={selectedGroupId}
@@ -120,8 +135,14 @@ function ProjectPageContent({ projectId }: ProjectPageContentProps) {
 
       {groupsError ? (
         <div className={styles.helperRow}>
-          <p className={styles.helperText}>Requirement groups could not be loaded.</p>
-          <Button type="button" variant="secondary" onClick={() => void refetchGroups()}>
+          <p className={styles.helperText}>
+            Requirement groups could not be loaded.
+          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => void refetchGroups()}
+          >
             Retry groups
           </Button>
         </div>
@@ -132,7 +153,8 @@ function ProjectPageContent({ projectId }: ProjectPageContentProps) {
 
 export default function ProjectPage() {
   const params = useParams();
-  const projectId = typeof params.projectId === "string" ? params.projectId : null;
+  const projectId =
+    typeof params.projectId === "string" ? params.projectId : null;
 
   if (!projectId) {
     return null;

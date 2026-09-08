@@ -11,7 +11,9 @@ import {
   FormDirtyStateReporter,
   FormInput,
   FormSelect,
+  FormStringListField,
   FormTextarea,
+  sanitizeStringList,
 } from "@/components/Form";
 import { Modal } from "@/components/Modal";
 import { SuccessMessage } from "@/components/SuccessMessage";
@@ -27,8 +29,8 @@ type CreateRequirementFormValues = {
   requirementType: string;
   priority: string;
   status: string;
-  acceptanceCriteria: string;
-  businessRules: string;
+  acceptanceCriteria: string[];
+  businessRules: string[];
 };
 
 const emptyValues: CreateRequirementFormValues = {
@@ -38,8 +40,8 @@ const emptyValues: CreateRequirementFormValues = {
   requirementType: "feature",
   priority: "medium",
   status: "draft",
-  acceptanceCriteria: "",
-  businessRules: "",
+  acceptanceCriteria: [],
+  businessRules: [],
 };
 
 const requirementTypeOptions = [
@@ -110,8 +112,8 @@ export function CreateRequirement({ projectId }: CreateRequirementProps) {
         title: values.title.trim(),
         description: values.description.trim(),
         group_id: values.groupId,
-        acceptance_criteria: splitLines(values.acceptanceCriteria),
-        business_rules: splitLines(values.businessRules),
+        acceptance_criteria: sanitizeStringList(values.acceptanceCriteria),
+        business_rules: sanitizeStringList(values.businessRules),
         requirement_type: values.requirementType,
         priority: values.priority,
         status: values.status,
@@ -269,10 +271,11 @@ function RequirementForm({
         name="acceptanceCriteria"
         label="Acceptance criteria"
       >
-        <FormTextarea<CreateRequirementFormValues>
+        <FormStringListField<CreateRequirementFormValues>
           name="acceptanceCriteria"
-          placeholder={"One criterion per line"}
-          rows={4}
+          addLabel="Add criterion"
+          itemPlaceholder="Describe a criterion"
+          itemAriaLabelPrefix="criterion"
           disabled={isSubmitting}
         />
       </FormField>
@@ -281,10 +284,11 @@ function RequirementForm({
         name="businessRules"
         label="Business rules"
       >
-        <FormTextarea<CreateRequirementFormValues>
+        <FormStringListField<CreateRequirementFormValues>
           name="businessRules"
-          placeholder={"One rule per line"}
-          rows={4}
+          addLabel="Add rule"
+          itemPlaceholder="Describe a rule"
+          itemAriaLabelPrefix="rule"
           disabled={isSubmitting}
         />
       </FormField>
@@ -313,11 +317,4 @@ function RequirementForm({
       </FormActions>
     </Form>
   );
-}
-
-function splitLines(value: string): string[] {
-  return value
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
 }
